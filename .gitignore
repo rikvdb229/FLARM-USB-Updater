@@ -1,0 +1,14 @@
+# EasyEDA backup files
+*.bak
+*.000
+*.001
+
+# EasyEDA cache
+fp-info-cache
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# macOS
+.DS_Store
