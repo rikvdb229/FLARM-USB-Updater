@@ -119,7 +119,7 @@ Use these names exactly (case-sensitive) for net labels:
 
 ## 6. Block 1 — MT3608 Boost Converter
 
-**Place:** U3 (C84817), L1 (C190170), D1 (C8598), R1 (C25741), R2 (C25905), R3 (C25744), C1 (C45783), C2 (C1525), C3 (C45783), C4 (C1779)
+**Place:** U3 (C84817), L1 (C135264), D1 (C8598), R1 (C25741), R2 (C25905), R3 (C25744), C1 (C45783), C2 (C1525), C3 (C45783), C4 (C1779)
 
 **Wire up:**
 

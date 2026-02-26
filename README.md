@@ -31,7 +31,7 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 | U1 | FT232RL USB-UART SSOP-28 | C8690 | Extended |
 | U2 | MAX3232CSE+T RS232 transceiver | C7258 | Extended |
 | U3 | MT3608 boost converter | C84817 | Extended |
-| L1 | 22µH shielded inductor 1A | C190170 | Extended |
+| L1 | 22µH shielded inductor 1A | C135264 | Extended |
 | D1 | B5819W SL Schottky 40V/1A SOD-123 | C8598 | Basic |
 | D2 | USBLC6-2SC6 USB ESD clamp | C7519 | Extended |
 | J1 | USB-C receptacle TYPE-C-31-M-12 | C165948 | Extended |
