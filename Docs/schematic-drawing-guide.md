@@ -237,6 +237,7 @@ U1 TEST  ── GND    ← required by datasheet
 U1 CTS#  ── GND    ← always clear-to-send
 U1 DSR#  ── GND
 U1 DCD#  ── GND
+U1 RI#   ── GND    ← ring indicator input, tie low when unused
 ```
 
 **Truly unused — add No-connect (X):**
