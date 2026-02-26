@@ -529,6 +529,10 @@ C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="c
 <span class="pin">U1 3V3OUT</span> ── C12 ── GND             <span class="comment">(100nF — do not load heavily)</span>
 <span class="pin">U1 3V3OUT</span> ── also to R7             <span class="comment">(section 10)</span>
 
+<span class="comment">-- USB data pins (CRITICAL — connects to D2 in Block 4) --</span>
+<span class="pin">U1 USBDP</span> ── net label <span class="net">UD+</span>             <span class="comment">(→ D2 I/O1 → J1 D+)</span>
+<span class="pin">U1 USBDM</span> ── net label <span class="net">UD−</span>             <span class="comment">(→ D2 I/O2 → J1 D−)</span>
+
 <span class="comment">-- UART signals --</span>
 <span class="pin">U1 TXD</span> ── net label <span class="net">UART_TX</span>
 <span class="pin">U1 RXD</span> ── net label <span class="net">UART_RX</span>
@@ -546,10 +550,13 @@ C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="c
 <span class="comment">-- No-connect (X) --</span>
 <span class="pin">U1 RTS#</span>   ── X
 <span class="pin">U1 DTR#</span>   ── X
-<span class="pin">U1 PWREN#</span> ── X
+<span class="pin">U1 RESET</span>  ── X    <span class="comment">← internal pull-up, leave as NC</span>
+<span class="pin">U1 OSCI</span>   ── X    <span class="comment">← internal oscillator, no crystal needed</span>
+<span class="pin">U1 OSCO</span>   ── X
 <span class="pin">U1 CBUS2</span>  ── X
 <span class="pin">U1 CBUS3</span>  ── X
 <span class="pin">U1 CBUS4</span>  ── X</pre>
+  <div class="note">PWREN# does not appear in the EasyEDA C8690 symbol — this is normal, ignore it.</div>
 </section>
 
 <hr>

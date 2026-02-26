@@ -213,6 +213,12 @@ C12 other side ── GND                   (100nF decoupling — do not load th
 U1 3V3OUT ── also connects to R7 (section 10)
 ```
 
+**USB data pins (connect to D2 via net labels):**
+```
+U1 USBDP ── net label UD+               (→ D2 I/O1 → J1 D+)
+U1 USBDM ── net label UD−               (→ D2 I/O2 → J1 D−)
+```
+
 **UART signals:**
 ```
 U1 TXD ── net label UART_TX
@@ -237,11 +243,15 @@ U1 DCD#  ── GND
 ```
 U1 RTS#   ── X
 U1 DTR#   ── X
-U1 PWREN# ── X
+U1 RESET  ── X    ← has internal pull-up; leave as NC
+U1 OSCI   ── X    ← internal oscillator, no crystal needed
+U1 OSCO   ── X
 U1 CBUS2  ── X
 U1 CBUS3  ── X
 U1 CBUS4  ── X
 ```
+
+> Note: PWREN# does not appear in the EasyEDA symbol for C8690 — this is normal, ignore it.
 
 ---
 
