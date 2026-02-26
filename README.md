@@ -2,65 +2,96 @@
 
 USB-to-RS232 adapter with 12V boost converter for updating FLARM firmware without external power.
 
-Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update tool. No 12V bench supply required.
+Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update tool. No 12V bench supply required. Also supports FLARM display firmware updates via the same connector.
 
 ## Features
 
 - Powered entirely from USB (5V)
-- 5V → ~11V boost converter (MT3608) supplies FLARM via RJ45 pins 1 & 2
-- FT232RL USB-to-UART bridge (enumerates as virtual COM port, no driver install on Win10/11)
+- 5V → ~12V boost converter (MT3608) supplies FLARM via RJ45 pins 1 & 2
+- FT232RL USB-to-UART bridge — uses Microsoft built-in usbser.sys, no driver install on Win10/11
 - MAX3232 RS232 level shifter (±9V signaling, compatible with all FLARM RS232 ports)
-- SS34 Schottky backfeed diode — safe to plug into FLARM on live 12V aircraft bus
+- B5819W Schottky backfeed diode — safe to plug into FLARM on live 12V aircraft bus
 - USB ESD protection (USBLC6-2SC6) on D+/D−
 - USB-C connector with proper CC pull-downs
+- Power, TX and RX LED indicators
+- RJ45 pin 3 (3.3V display power) driven from FT232RL 3V3OUT — powers FLARM displays during display firmware updates
 
 ## Hardware
 
 Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 
+> **Note on C-numbers:** IC and connector C-numbers are confirmed. Passive C-numbers
+> (resistors/caps) are from the JLCPCB Basic parts library and should be verified in
+> EasyEDA before ordering — search the value + package if a number doesn't match.
+
 ### Component List
 
-| Ref  | Description                     | JLCPCB #  | Class    |
-|------|---------------------------------|-----------|----------|
-| U1   | FT232RL USB-UART bridge         | C8690     | Extended |
-| U2   | MAX3232CSE+T RS232 transceiver  | C7258     | Extended |
-| U3   | MT3608 boost converter          | C84817    | Extended |
-| L1   | 22 µH shielded inductor, 1A     | C190170   | Extended |
-| D1   | SS34 Schottky 3A/40V            | C8598     | Extended |
-| D2   | USBLC6-2SC6 USB ESD clamp       | C7519     | Extended |
-| J1   | USB-C receptacle TYPE-C-31-M-12 | C165948   | Extended |
-| J2   | RJ45 8P8C KH-RJ45-58-8P8C      | C2683360  | Extended |
-| LED1 | Green LED 0805                  | C84256    | Basic    |
-| C1   | 22 µF / 10V 0805                | —         | Basic    |
-| C2   | 100 nF 0402                     | —         | Basic    |
-| C3   | 22 µF / 25V 0805                | —         | Basic    |
-| C4   | 100 nF 0402 (MAX3232 CP1)       | —         | Basic    |
-| C5   | 100 nF 0402 (MAX3232 CP2)       | —         | Basic    |
-| C6   | 1 µF 0402 (MAX3232 V+)          | —         | Basic    |
-| C7   | 1 µF 0402 (MAX3232 V−)          | —         | Basic    |
-| C8   | 100 nF 0402                     | —         | Basic    |
-| C9   | 100 nF 0402                     | —         | Basic    |
-| C10  | 100 nF 0402                     | —         | Basic    |
-| C11  | 4.7 µF 0805                     | —         | Basic    |
-| C12  | 100 nF 0402                     | —         | Basic    |
-| R1   | 10 kΩ 0402                      | —         | Basic    |
-| R2   | 1.8 MΩ 0402                     | —         | Basic    |
-| R3   | 100 kΩ 0402                     | —         | Basic    |
-| R4   | 10 kΩ 0402                      | —         | Basic    |
-| R5   | 1 MΩ 0402                       | —         | Basic    |
-| R6   | 5.1 kΩ 0402 (×2)                | —         | Basic    |
-| R7   | 1 kΩ 0402                       | —         | Basic    |
-| R8   | 0 Ω / DNP 0402                  | —         | Basic    |
+| Ref | Description | JLCPCB # | Class |
+|-----|-------------|-----------|-------|
+| U1 | FT232RL USB-UART SSOP-28 | C8690 | Extended |
+| U2 | MAX3232CSE+T RS232 transceiver | C7258 | Extended |
+| U3 | MT3608 boost converter | C84817 | Extended |
+| L1 | 22µH shielded inductor 1A | C190170 | Extended |
+| D1 | B5819W SL Schottky 40V/1A SOD-123 | C8598 | Basic |
+| D2 | USBLC6-2SC6 USB ESD clamp | C7519 | Extended |
+| J1 | USB-C receptacle TYPE-C-31-M-12 | C165948 | Extended |
+| J2 | RJ45 8P8C shielded KH-RJ45-58-8P8C | C2683360 | Extended |
+| LED1 | Green LED 0805 — power (KT-0805G) | C2297 | Basic |
+| LED2 | Green LED 0805 — TX (KT-0805G) | C2297 | Basic |
+| LED3 | Yellow LED 0805 — RX (KT-0805Y) | C2296 | Basic |
+| R1 | 100kΩ 0402 — MT3608 FB top | C25741 | Basic |
+| R2 | 5.1kΩ 0402 — MT3608 FB bottom | C25905 | Basic |
+| R3 | 10kΩ 0402 — MT3608 EN pull-up | C25744 | Basic |
+| R4 | 5.1kΩ 0402 — USB-C CC1 | C25905 | Basic |
+| R5 | 5.1kΩ 0402 — USB-C CC2 | C25905 | Basic |
+| R6 | 1kΩ 0402 — power LED current | C11702 | Basic |
+| R7 | 10Ω 0402 — RJ45 pin 3 current limit | C25077 | Basic |
+| R8 | 1kΩ 0402 — TX LED current | C11702 | Basic |
+| R9 | 1kΩ 0402 — RX LED current | C11702 | Basic |
+| C1 | 22µF / 25V 0805 — MT3608 Vin | C45783 | Basic |
+| C2 | 100nF 0402 — MT3608 Vin | C1525 | Basic |
+| C3 | 22µF / 25V 0805 — MT3608 Vout | C45783 | Basic |
+| C4 | 4.7µF / 25V 0805 — MT3608 Vout aux | C1779 | Basic |
+| C5 | 100nF 0402 — MAX3232 VCC | C1525 | Basic |
+| C6 | 100nF 0402 — MAX3232 CP1 | C1525 | Basic |
+| C7 | 100nF 0402 — MAX3232 CP2 | C1525 | Basic |
+| C8 | 100nF 0402 — MAX3232 V+ | C1525 | Basic |
+| C9 | 100nF 0402 — MAX3232 V- | C1525 | Basic |
+| C10 | 4.7µF / 25V 0805 — FT232RL VCC bulk | C1779 | Basic |
+| C11 | 100nF 0402 — FT232RL VCC | C1525 | Basic |
+| C12 | 100nF 0402 — FT232RL 3V3OUT | C1525 | Basic |
+| C13 | 100nF 0402 — FT232RL VCCIO | C1525 | Basic |
+| C14 | 100nF 0402 — USBLC6 VCC | C1525 | Basic |
 
-### FLARM RJ45 Pinout (8P8C)
+**32 components — 7 Extended parts ($21 in JLCPCB setup fees)**
 
-| Pin    | Signal   | This device         |
-|--------|----------|---------------------|
-| 1, 2   | +12V     | From boost (via D1) |
-| 3      | FLARM 3V3 | NC                 |
-| 4,7–10 | GND      | PCB GND             |
-| 5      | FLARM TX | RS232 RX input      |
-| 6      | FLARM RX | RS232 TX output     |
+Unique passive C-numbers: only 6 distinct parts cover all 25 passives.
+
+### FLARM RJ45 Pinout (8P8C shielded)
+
+| Pin | Signal | This device |
+|-----|--------|-------------|
+| 1, 2 | +12V | From boost via D1 (~12.0V) |
+| 3 | FLARM 3V3 | From FT232RL 3V3OUT via R7 (10Ω) |
+| 4, 7, 8 | GND | PCB GND |
+| 5 | FLARM TX | RS232 RX input |
+| 6 | FLARM RX | RS232 TX output |
+| 9, 10 | Shield | PCB GND copper pour |
+
+**Pin 3 note:** R7 (10Ω) always populated — bridges FT232RL 3V3OUT to RJ45 pin 3.
+- FLARM update: FLARM drives pin 3 itself; R7 limits any current mismatch. Safe.
+- Display update: FT232RL 3V3OUT (50mA max) powers display via R7. Display current draw is low (~10–25mA); voltage drop across R7 is negligible. FT232RL 3V3OUT is sufficient.
+
+### LED Indicators
+
+| LED | Colour | Signal | Behaviour |
+|-----|--------|--------|-----------|
+| LED1 | Green (C2297) | VUSB | Always on when USB connected |
+| LED2 | Green (C2297) | FT232RL TXLED# (CBUS0) | Flashes during data transmission |
+| LED3 | Yellow (C2296) | FT232RL RXLED# (CBUS1) | Flashes during data reception |
+
+TXLED# and RXLED# are active-low, default CBUS0/CBUS1 factory config — no EEPROM needed.
+Wiring: VUSB → 1kΩ → LED anode → cathode → TXLED#/RXLED# pin.
 
 ## Power Notes
 
@@ -70,8 +101,16 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 
 ## Boost Converter Output
 
-Vout = 0.6 × (1 + R2/R3) = 0.6 × (1 + 1.8M/100k) ≈ 11.4V
-After SS34 drop (~0.4V): ≈ 11.0V at RJ45 — within FLARM 8–36V input range.
+Vout = 0.6 × (1 + R1/R2) = 0.6 × (1 + 100k/5.1k) ≈ **12.36V**
+After B5819W drop (~0.4V): ≈ **12.0V** at RJ45 — nominal aircraft voltage, within FLARM 8–36V range.
+Output caps: C3 + C4 (22µF + 4.7µF at 25V — 2× margin over 12.36V output).
+
+## Cost Estimate (JLCPCB SMT assembly)
+
+| Qty | PCB | SMT | Extended fees | Components | Shipping | Total | Per board |
+|-----|-----|-----|---------------|------------|----------|-------|-----------|
+| 5 | $2 | $8 | $21 | ~$37.50 | ~$15 | ~$83.50 | ~$16.70 |
+| 10 | $4 | $8 | $21 | ~$75 | ~$15 | ~$123 | ~$12.30 |
 
 ## Files
 
