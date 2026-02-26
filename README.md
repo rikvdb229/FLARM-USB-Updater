@@ -49,19 +49,19 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 | R8 | 1kΩ 0402 — TX LED current | C11702 | Basic |
 | R9 | 1kΩ 0402 — RX LED current | C11702 | Basic |
 | C1 | 22µF / 25V 0805 — MT3608 Vin | C45783 | Basic |
-| C2 | 100nF 0402 — MT3608 Vin | C1525 | Basic |
+| C2 | 100nF 0402 — MT3608 Vin | C307331 | Basic |
 | C3 | 22µF / 25V 0805 — MT3608 Vout | C45783 | Basic |
 | C4 | 4.7µF / 25V 0805 — MT3608 Vout aux | C1779 | Basic |
-| C5 | 100nF 0402 — MAX3232 VCC | C1525 | Basic |
-| C6 | 100nF 0402 — MAX3232 CP1 | C1525 | Basic |
-| C7 | 100nF 0402 — MAX3232 CP2 | C1525 | Basic |
-| C8 | 100nF 0402 — MAX3232 V+ | C1525 | Basic |
-| C9 | 100nF 0402 — MAX3232 V- | C1525 | Basic |
+| C5 | 100nF 0402 — MAX3232 VCC | C307331 | Basic |
+| C6 | 100nF 0402 — MAX3232 CP1 | C307331 | Basic |
+| C7 | 100nF 0402 — MAX3232 CP2 | C307331 | Basic |
+| C8 | 100nF 0402 — MAX3232 V+ | C307331 | Basic |
+| C9 | 100nF 0402 — MAX3232 V- | C307331 | Basic |
 | C10 | 4.7µF / 25V 0805 — FT232RL VCC bulk | C1779 | Basic |
-| C11 | 100nF 0402 — FT232RL VCC | C1525 | Basic |
-| C12 | 100nF 0402 — FT232RL 3V3OUT | C1525 | Basic |
-| C13 | 100nF 0402 — FT232RL VCCIO | C1525 | Basic |
-| C14 | 100nF 0402 — USBLC6 VCC | C1525 | Basic |
+| C11 | 100nF 0402 — FT232RL VCC | C307331 | Basic |
+| C12 | 100nF 0402 — FT232RL 3V3OUT | C307331 | Basic |
+| C13 | 100nF 0402 — FT232RL VCCIO | C307331 | Basic |
+| C14 | 100nF 0402 — USBLC6 VCC | C307331 | Basic |
 
 **32 components — 7 Extended parts ($21 in JLCPCB setup fees)**
 

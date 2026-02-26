@@ -119,7 +119,7 @@ Use these names exactly (case-sensitive) for net labels:
 
 ## 6. Block 1 — MT3608 Boost Converter
 
-**Place:** U3 (C84817), L1 (C135264), D1 (C8598), R1 (C25741), R2 (C25905), R3 (C25744), C1 (C45783), C2 (C1525), C3 (C45783), C4 (C1779)
+**Place:** U3 (C84817), L1 (C135264), D1 (C8598), R1 (C25741), R2 (C25905), R3 (C25744), C1 (C45783), C2 (C307331), C3 (C45783), C4 (C1779)
 
 **Wire up:**
 
@@ -160,7 +160,7 @@ D1 cathode ── net label V12_OUT
 
 ## 7. Block 2 — MAX3232 RS232
 
-**Place:** U2 (C7258), C5 (C1525), C6 (C1525), C7 (C1525), C8 (C1525), C9 (C1525)
+**Place:** U2 (C7258), C5 (C307331), C6 (C307331), C7 (C307331), C8 (C307331), C9 (C307331)
 
 **Power:**
 ```
@@ -193,7 +193,7 @@ U2 T2OUT ── No-connect (X)
 
 ## 8. Block 3 — FT232RL USB-UART
 
-**Place:** U1 (C8690), C10 (C1779), C11 (C1525), C12 (C1525), C13 (C1525)
+**Place:** U1 (C8690), C10 (C1779), C11 (C307331), C12 (C307331), C13 (C307331)
 
 **Power:**
 ```
@@ -247,7 +247,7 @@ U1 CBUS4  ── X
 
 ## 9. Block 4 — USB-C Input
 
-**Place:** J1 (C165948), D2 (C7519), R4 (C25905), R5 (C25905), C14 (C1525)
+**Place:** J1 (C165948), D2 (C7519), R4 (C25905), R5 (C25905), C14 (C307331)
 
 **Power:**
 ```

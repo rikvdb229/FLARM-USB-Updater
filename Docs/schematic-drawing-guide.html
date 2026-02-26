@@ -450,7 +450,7 @@
     <div class="section-num">6</div>
     <h2>Block 1 — MT3608 Boost Converter</h2>
   </div>
-  <p>Place: U3 <code>C84817</code>, L1 <code>C135264</code>, D1 <code>C8598</code>, R1 <code>C25741</code>, R2 <code>C25905</code>, R3 <code>C25744</code>, C1 <code>C45783</code>, C2 <code>C1525</code>, C3 <code>C45783</code>, C4 <code>C1779</code></p>
+  <p>Place: U3 <code>C84817</code>, L1 <code>C135264</code>, D1 <code>C8598</code>, R1 <code>C25741</code>, R2 <code>C25905</code>, R3 <code>C25744</code>, C1 <code>C45783</code>, C2 <code>C307331</code>, C3 <code>C45783</code>, C4 <code>C1779</code></p>
   <pre><span class="comment">-- Main circuit --</span>
 <span class="pin">U3 Vin</span>  ── net label <span class="net">VUSB</span>
 <span class="pin">U3 GND</span>  ── GND power port
@@ -484,7 +484,7 @@ D1 cathode ── net label <span class="net">V12_OUT</span></pre>
     <div class="section-num">7</div>
     <h2>Block 2 — MAX3232 RS232 Transceiver</h2>
   </div>
-  <p>Place: U2 <code>C7258</code>, C5–C9 all <code>C1525</code></p>
+  <p>Place: U2 <code>C7258</code>, C5–C9 all <code>C307331</code></p>
   <pre><span class="comment">-- Power --</span>
 <span class="pin">U2 VCC</span> ── <span class="net">VUSB</span>
 <span class="pin">U2 GND</span> ── GND
@@ -515,7 +515,7 @@ C9: <span class="pin">V−</span>  pin ── GND                <span class="co
     <div class="section-num">8</div>
     <h2>Block 3 — FT232RL USB-UART</h2>
   </div>
-  <p>Place: U1 <code>C8690</code>, C10 <code>C1779</code>, C11–C13 <code>C1525</code></p>
+  <p>Place: U1 <code>C8690</code>, C10 <code>C1779</code>, C11–C13 <code>C307331</code></p>
   <pre><span class="comment">-- Power --</span>
 <span class="pin">U1 VCC</span>   ── <span class="net">VUSB</span>
 <span class="pin">U1 VCCIO</span> ── <span class="net">VUSB</span>                    <span class="comment">(IO voltage = 5V)</span>
@@ -560,7 +560,7 @@ C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="c
     <div class="section-num">9</div>
     <h2>Block 4 — USB-C Input</h2>
   </div>
-  <p>Place: J1 <code>C165948</code>, D2 <code>C7519</code>, R4 <code>C25905</code>, R5 <code>C25905</code>, C14 <code>C1525</code></p>
+  <p>Place: J1 <code>C165948</code>, D2 <code>C7519</code>, R4 <code>C25905</code>, R5 <code>C25905</code>, C14 <code>C307331</code></p>
   <pre><span class="comment">-- Power --</span>
 <span class="pin">J1 VBUS</span> ── net label <span class="net">VUSB</span>
 <span class="pin">J1 GND</span>  ── GND  <span class="comment">(all GND pins)</span>
