@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyEDA Pro — Schematic Guide · FLARM USB Updater</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #4f8ef7;
+      --accent2: #7dd6a8;
+      --warn: #f9a825;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --code-bg: #141720;
+      --radius: 10px;
+      font-size: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.65;
+      padding: 0 0 80px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #1e2a4a 0%, #0f1730 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 20px 24px;
+      text-align: center;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+    header p  { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+    .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+      margin-top: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── TOC ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    nav a {
+      display: inline-block;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-right: 14px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    nav a:active { background: var(--surface2); }
+
+    /* ── CONTENT ── */
+    main { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+    /* ── SECTION ── */
+    section { margin-top: 32px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-num {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin: 18px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    p { margin: 8px 0; font-size: 0.92rem; color: var(--text); }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin: 10px 0;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; margin: 10px 0; border-radius: var(--radius); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+      background: var(--surface);
+    }
+    th {
+      background: var(--surface2);
+      color: var(--accent);
+      font-weight: 600;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+    code {
+      font-family: 'SF Mono', Menlo, 'Courier New', monospace;
+      background: var(--code-bg);
+      color: var(--accent2);
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 0.85em;
+    }
+
+    /* ── CODE BLOCK ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin: 10px 0;
+      overflow-x: auto;
+      font-family: 'SF Mono', Menlo, 'Courier New', monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #a9c4e8;
+    }
+    pre .comment { color: var(--muted); }
+    pre .net { color: var(--accent2); }
+    pre .pin { color: #f9c74f; }
+
+    /* ── KEY BADGE ── */
+    .key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom-width: 2px;
+      color: #fff;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
+      min-width: 28px;
+    }
+
+    /* ── NOTE / WARN ── */
+    .note {
+      background: rgba(79, 142, 247, 0.1);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 0.87rem;
+    }
+    .warn {
+      background: rgba(249, 168, 37, 0.1);
+      border-left: 3px solid var(--warn);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 10px 14px;
+      margin: 10px 0;
+      font-size: 0.87rem;
+      color: #fce4a0;
+    }
+
+    /* ── CHECKLIST ── */
+    .checklist { list-style: none; margin: 10px 0; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before {
+      content: '☐';
+      color: var(--accent);
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── LAYOUT ASCII ── */
+    .layout-box {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      font-family: 'SF Mono', Menlo, monospace;
+      font-size: 0.72rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      color: #8ecbf7;
+      white-space: pre;
+    }
+
+    /* ── STEP LIST ── */
+    ol.steps { padding-left: 0; list-style: none; counter-reset: step; }
+    ol.steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 12px;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+    }
+    ol.steps li:last-child { border-bottom: none; }
+    ol.steps li::before {
+      content: counter(step);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.75rem;
+      font-weight: 700;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── DIVIDER ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+    /* ── ANCHOR ── */
+    a[id] { scroll-margin-top: 80px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>EasyEDA Pro — Schematic Drawing Guide</h1>
+  <p>FLARM USB Updater · v1.0</p>
+  <span class="badge">iPad Reference</span>
+</header>
+
+<nav>
+  <a href="#shortcuts">Shortcuts</a>
+  <a href="#layout">Layout</a>
+  <a href="#setup">Setup</a>
+  <a href="#place">Placing</a>
+  <a href="#connect">Wiring</a>
+  <a href="#nets">Net Names</a>
+  <a href="#boost">Boost</a>
+  <a href="#rs232">MAX3232</a>
+  <a href="#ft232">FT232RL</a>
+  <a href="#usbc">USB-C</a>
+  <a href="#rj45">RJ45</a>
+  <a href="#leds">LEDs</a>
+  <a href="#cleanup">Cleanup</a>
+  <a href="#erc">ERC</a>
+  <a href="#checklist">Checklist</a>
+  <a href="#export">Export</a>
+</nav>
+
+<main>
+
+<!-- ── 0. SHORTCUTS ── -->
+<section id="shortcuts">
+  <div class="section-header">
+    <div class="section-num">0</div>
+    <h2>Keyboard Shortcuts</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Key</th><th>Action</th></tr>
+      <tr><td><span class="key">W</span></td><td>Wire tool</td></tr>
+      <tr><td><span class="key">N</span></td><td>Net label</td></tr>
+      <tr><td><span class="key">P</span></td><td>Power port (GND, VCC)</td></tr>
+      <tr><td><span class="key">X</span></td><td>No-connect flag</td></tr>
+      <tr><td><span class="key">R</span></td><td>Rotate component (while placing)</td></tr>
+      <tr><td><span class="key">G</span></td><td>Move component + connected wires</td></tr>
+      <tr><td><span class="key">Ctrl</span>+<span class="key">D</span></td><td>Duplicate</td></tr>
+      <tr><td><span class="key">Ctrl</span>+<span class="key">Z</span></td><td>Undo</td></tr>
+      <tr><td><span class="key">Esc</span></td><td>Cancel current tool</td></tr>
+      <tr><td><span class="key">Ctrl</span>+<span class="key">S</span></td><td>Save</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr>
+
+<!-- ── 1. LAYOUT ── -->
+<section id="layout">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Block Layout on the Sheet</h2>
+  </div>
+  <p>Follow <strong>left-to-right signal flow</strong> and <strong>top-to-bottom power flow</strong>.</p>
+  <div class="layout-box">┌─────────────────────────────────────────────────────────────────────┐
+│             [MT3608 + L1 + D1 + C1-C4 + R1-R3]                     │
+│                   BOOST CONVERTER  (top centre)                     │
+│                                                                     │
+│  [J1 USB-C]  [FT232RL U1]  [MAX3232 U2]  [J2 RJ45]                 │
+│  [D2 USBLC6] [C10-C13]     [C5-C9]       [R7]                      │
+│  [R4, R5]                                                           │
+│  [C14]                                                              │
+│   USB-C       USB-UART      RS232          CONNECTOR                │
+│   (left)      (centre-L)   (centre-R)      (right)                  │
+│                                                                     │
+│           [LED1  LED2  LED3 + R6 R8 R9]                            │
+│                INDICATORS  (bottom centre)                          │
+└─────────────────────────────────────────────────────────────────────┘</div>
+  <div class="card" style="margin-top:12px">
+    <h3>Spacing Tips</h3>
+    <ul style="list-style:disc;padding-left:18px;font-size:0.88rem;line-height:1.9">
+      <li>Leave ~3–4 grid squares between blocks — room for bypass caps and labels</li>
+      <li>Place decoupling caps directly beside their IC's power pins</li>
+      <li>Cluster charge pump caps C6–C9 around U2 (only connected to U2)</li>
+      <li>Stack boost feedback divider R1, R2 vertically below U3's FB pin</li>
+      <li>Group LEDs in a horizontal row (mirrors PCB edge placement)</li>
+    </ul>
+  </div>
+</section>
+
+<hr>
+
+<!-- ── 2. SETUP ── -->
+<section id="setup">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Project Setup</h2>
+  </div>
+  <ol class="steps">
+    <li>Open <strong>EasyEDA Pro</strong> desktop app</li>
+    <li><strong>File → New Project</strong> → name it <code>FLARM-USB-Updater</code></li>
+    <li>A blank schematic sheet opens — this is your only sheet</li>
+    <li><strong>File → Save to Computer</strong> → save to <code>d:\CodeProjects\FLARM-USB-Updater\EasyEDA\</code><br>
+        Filename: <code>FLARM-USB-Updater.epro</code></li>
+    <li>Right-click the title block → Edit → set Title: <code>FLARM USB Updater</code> · Rev: <code>1.0</code></li>
+  </ol>
+</section>
+
+<hr>
+
+<!-- ── 3. PLACING ── -->
+<section id="place">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>How to Place Any Component</h2>
+  </div>
+  <ol class="steps">
+    <li>Open <strong>Parts panel</strong> (left sidebar)</li>
+    <li>Click the <strong>JLCPCB</strong> tab</li>
+    <li>Type the <strong>C-number</strong> in the search box (e.g. <code>C8690</code>)</li>
+    <li>Click the result → symbol loads</li>
+    <li>Click on schematic to place · press <span class="key">R</span> to rotate first if needed</li>
+    <li>Press <span class="key">Esc</span> when done</li>
+  </ol>
+  <div class="note">For resistors and caps: search by C-number exactly the same way. EasyEDA will auto-fill JLCPCB part number and footprint.</div>
+</section>
+
+<hr>
+
+<!-- ── 4. WIRING ── -->
+<section id="connect">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>How to Connect Components</h2>
+  </div>
+  <div class="card">
+    <h3>Wires</h3>
+    <p>Press <span class="key">W</span> → click start pin → click end pin → press <span class="key">Esc</span></p>
+  </div>
+  <div class="card">
+    <h3>Net Labels (for distant signals)</h3>
+    <p>Press <span class="key">N</span> → type the net name → click a pin to attach.<br>
+    Any two pins sharing the same net name are connected, even without a physical wire.</p>
+  </div>
+  <div class="card">
+    <h3>Power Ports (GND, VUSB, etc.)</h3>
+    <p>Press <span class="key">P</span> → search <code>GND</code> → place on every GND pin.<br>
+    For custom nets (VUSB, VBOOST, V12_OUT): use Net Label <span class="key">N</span>.</p>
+  </div>
+  <div class="card">
+    <h3>No-Connect</h3>
+    <p>Press <span class="key">X</span> → click any unused pin that is intentionally unconnected.</p>
+  </div>
+</section>
+
+<hr>
+
+<!-- ── 5. NET NAMES ── -->
+<section id="nets">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Net Names (use exactly as shown)</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Net</th><th>Description</th></tr>
+      <tr><td><code>GND</code></td><td>Ground — use power port symbol</td></tr>
+      <tr><td><code>VUSB</code></td><td>USB 5V rail</td></tr>
+      <tr><td><code>VBOOST</code></td><td>MT3608 output (~12.36V, before diode)</td></tr>
+      <tr><td><code>V12_OUT</code></td><td>After B5819W diode (~12.0V to RJ45)</td></tr>
+      <tr><td><code>UART_TX</code></td><td>FT232RL TXD → MAX3232 T1IN</td></tr>
+      <tr><td><code>UART_RX</code></td><td>FT232RL RXD ← MAX3232 R1OUT</td></tr>
+      <tr><td><code>RS232_TX</code></td><td>MAX3232 T1OUT → RJ45 pin 6</td></tr>
+      <tr><td><code>RS232_RX</code></td><td>MAX3232 R1IN ← RJ45 pin 5</td></tr>
+    </table>
+  </div>
+</section>
+
+<hr>
+
+<!-- ── 6. BOOST ── -->
+<section id="boost">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>Block 1 — MT3608 Boost Converter</h2>
+  </div>
+  <p>Place: U3 <code>C84817</code>, L1 <code>C190170</code>, D1 <code>C8598</code>, R1 <code>C25741</code>, R2 <code>C25905</code>, R3 <code>C25744</code>, C1 <code>C45783</code>, C2 <code>C1525</code>, C3 <code>C45783</code>, C4 <code>C1779</code></p>
+  <pre><span class="comment">-- Main circuit --</span>
+<span class="pin">U3 Vin</span>  ── net label <span class="net">VUSB</span>
+<span class="pin">U3 GND</span>  ── GND power port
+<span class="pin">U3 EN</span>   ── R3 one side
+R3 other side ── net label <span class="net">VUSB</span>        <span class="comment">(10kΩ pull-up, always enabled)</span>
+<span class="pin">U3 SW</span>   ── L1 one side
+L1 other side ── net label <span class="net">VBOOST</span>
+<span class="pin">U3 FB</span>   ── junction of R1 and R2
+R1 other side ── net label <span class="net">VBOOST</span>    <span class="comment">(100kΩ, top of divider)</span>
+R2 other side ── GND                  <span class="comment">(5.1kΩ, bottom of divider)</span>
+
+<span class="comment">-- Input decoupling (VUSB rail) --</span>
+C1 + side ── <span class="net">VUSB</span>,  C1 − ── GND     <span class="comment">(22µF/25V 0805)</span>
+C2 one side ── <span class="net">VUSB</span>, C2 other ── GND <span class="comment">(100nF 0402)</span>
+
+<span class="comment">-- Output caps (VBOOST net) --</span>
+C3 + side ── <span class="net">VBOOST</span>, C3 − ── GND   <span class="comment">(22µF/25V 0805)</span>
+C4 + side ── <span class="net">VBOOST</span>, C4 − ── GND   <span class="comment">(4.7µF/25V 0805)</span>
+
+<span class="comment">-- Backfeed diode D1 (B5819W) --</span>
+D1 anode   ── net label <span class="net">VBOOST</span>
+D1 cathode ── net label <span class="net">V12_OUT</span></pre>
+  <div class="warn">Verify: VBOOST → L1, R1, C3, C4, D1 anode only.<br>Verify: V12_OUT → D1 cathode and RJ45 section only.</div>
+</section>
+
+<hr>
+
+<!-- ── 7. MAX3232 ── -->
+<section id="rs232">
+  <div class="section-header">
+    <div class="section-num">7</div>
+    <h2>Block 2 — MAX3232 RS232 Transceiver</h2>
+  </div>
+  <p>Place: U2 <code>C7258</code>, C5–C9 all <code>C1525</code></p>
+  <pre><span class="comment">-- Power --</span>
+<span class="pin">U2 VCC</span> ── <span class="net">VUSB</span>
+<span class="pin">U2 GND</span> ── GND
+C5 + ── <span class="net">VUSB</span>, C5 − ── GND          <span class="comment">(100nF VCC bypass)</span>
+
+<span class="comment">-- Charge pump caps --</span>
+C6: <span class="pin">C1+</span> pin ↔ <span class="pin">C1−</span> pin             <span class="comment">(100nF)</span>
+C7: <span class="pin">C2+</span> pin ↔ <span class="pin">C2−</span> pin             <span class="comment">(100nF)</span>
+C8: <span class="pin">V+</span>  pin ── GND                <span class="comment">(100nF)</span>
+C9: <span class="pin">V−</span>  pin ── GND                <span class="comment">(100nF)</span>
+
+<span class="comment">-- Signal pins --</span>
+<span class="pin">U2 T1IN</span>  ── net label <span class="net">UART_TX</span>
+<span class="pin">U2 T1OUT</span> ── net label <span class="net">RS232_TX</span>
+<span class="pin">U2 R1IN</span>  ── net label <span class="net">RS232_RX</span>
+<span class="pin">U2 R1OUT</span> ── net label <span class="net">UART_RX</span>
+<span class="pin">U2 T2IN</span>  ── GND                      <span class="comment">(unused channel — tie low)</span>
+<span class="pin">U2 R2IN</span>  ── X (no-connect)
+<span class="pin">U2 R2OUT</span> ── X
+<span class="pin">U2 T2OUT</span> ── X</pre>
+</section>
+
+<hr>
+
+<!-- ── 8. FT232RL ── -->
+<section id="ft232">
+  <div class="section-header">
+    <div class="section-num">8</div>
+    <h2>Block 3 — FT232RL USB-UART</h2>
+  </div>
+  <p>Place: U1 <code>C8690</code>, C10 <code>C1779</code>, C11–C13 <code>C1525</code></p>
+  <pre><span class="comment">-- Power --</span>
+<span class="pin">U1 VCC</span>   ── <span class="net">VUSB</span>
+<span class="pin">U1 VCCIO</span> ── <span class="net">VUSB</span>                    <span class="comment">(IO voltage = 5V)</span>
+<span class="pin">U1 AGND</span>  ── GND
+<span class="pin">U1 GND</span>   ── GND
+C10 + ── <span class="net">VUSB</span>, C10 − ── GND        <span class="comment">(4.7µF bulk)</span>
+C11 ── <span class="net">VUSB</span> ↔ GND                  <span class="comment">(100nF VCC bypass)</span>
+C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="comment">(100nF VCCIO bypass)</span>
+
+<span class="comment">-- 3V3OUT (internal LDO) --</span>
+<span class="pin">U1 3V3OUT</span> ── C12 ── GND             <span class="comment">(100nF — do not load heavily)</span>
+<span class="pin">U1 3V3OUT</span> ── also to R7             <span class="comment">(section 10)</span>
+
+<span class="comment">-- UART signals --</span>
+<span class="pin">U1 TXD</span> ── net label <span class="net">UART_TX</span>
+<span class="pin">U1 RXD</span> ── net label <span class="net">UART_RX</span>
+
+<span class="comment">-- LED signals --</span>
+<span class="pin">U1 CBUS0</span> (TXLED#) ── net label <span class="net">TXLED</span>
+<span class="pin">U1 CBUS1</span> (RXLED#) ── net label <span class="net">RXLED</span>
+
+<span class="comment">-- Tie to GND (NOT no-connect!) --</span>
+<span class="pin">U1 TEST</span> ── GND
+<span class="pin">U1 CTS#</span> ── GND
+<span class="pin">U1 DSR#</span> ── GND
+<span class="pin">U1 DCD#</span> ── GND
+
+<span class="comment">-- No-connect (X) --</span>
+<span class="pin">U1 RTS#</span>   ── X
+<span class="pin">U1 DTR#</span>   ── X
+<span class="pin">U1 PWREN#</span> ── X
+<span class="pin">U1 CBUS2</span>  ── X
+<span class="pin">U1 CBUS3</span>  ── X
+<span class="pin">U1 CBUS4</span>  ── X</pre>
+</section>
+
+<hr>
+
+<!-- ── 9. USB-C ── -->
+<section id="usbc">
+  <div class="section-header">
+    <div class="section-num">9</div>
+    <h2>Block 4 — USB-C Input</h2>
+  </div>
+  <p>Place: J1 <code>C165948</code>, D2 <code>C7519</code>, R4 <code>C25905</code>, R5 <code>C25905</code>, C14 <code>C1525</code></p>
+  <pre><span class="comment">-- Power --</span>
+<span class="pin">J1 VBUS</span> ── net label <span class="net">VUSB</span>
+<span class="pin">J1 GND</span>  ── GND  <span class="comment">(all GND pins)</span>
+
+<span class="comment">-- CC pull-downs (identifies as power sink) --</span>
+<span class="pin">J1 CC1</span> ── R4 ── GND               <span class="comment">(5.1kΩ)</span>
+<span class="pin">J1 CC2</span> ── R5 ── GND               <span class="comment">(5.1kΩ)</span>
+
+<span class="comment">-- USB data through ESD clamp D2 (USBLC6-2SC6) --</span>
+<span class="pin">J1 D+</span>  ── <span class="pin">D2 I/O1</span> ── <span class="pin">U1 UD+</span>
+<span class="pin">J1 D−</span>  ── <span class="pin">D2 I/O2</span> ── <span class="pin">U1 UD−</span>
+<span class="pin">D2 VCC</span> ── <span class="net">VUSB</span>
+<span class="pin">D2 GND</span> ── GND
+C14 ── <span class="net">VUSB</span> ↔ GND                 <span class="comment">(100nF bypass on D2 VCC)</span>
+
+<span class="comment">-- Unused J1 pins --</span>
+<span class="pin">J1 SBU1</span>, <span class="pin">SBU2</span>        ── X
+<span class="pin">J1 D+/D− secondary</span>  ── X  <span class="comment">(USB-C has 2 pairs; only route one)</span></pre>
+  <div class="warn">USBLC6-2SC6 has a specific SOT-23-6 pin layout — verify I/O1/I/O2/VCC/GND labels match the datasheet before wiring.</div>
+</section>
+
+<hr>
+
+<!-- ── 10. RJ45 ── -->
+<section id="rj45">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <h2>Block 5 — RJ45 Output (FLARM connector)</h2>
+  </div>
+  <p>Place: J2 <code>C2683360</code>, R7 <code>C25077</code></p>
+  <pre><span class="pin">J2 pin 1</span> ── <span class="net">V12_OUT</span>
+<span class="pin">J2 pin 2</span> ── <span class="net">V12_OUT</span>
+<span class="pin">J2 pin 3</span> ── R7 one side
+R7 other side ── <span class="pin">U1 3V3OUT</span>          <span class="comment">(10Ω current-limit)</span>
+<span class="pin">J2 pin 4</span> ── GND
+<span class="pin">J2 pin 5</span> ── net label <span class="net">RS232_RX</span>    <span class="comment">(← from MAX3232 R1IN)</span>
+<span class="pin">J2 pin 6</span> ── net label <span class="net">RS232_TX</span>    <span class="comment">(→ to MAX3232 T1OUT)</span>
+<span class="pin">J2 pin 7</span> ── GND
+<span class="pin">J2 pin 8</span> ── GND
+<span class="pin">J2 pin 9</span> ── GND   <span class="comment">(shield tab)</span>
+<span class="pin">J2 pin 10</span> ── GND  <span class="comment">(shield tab)</span></pre>
+</section>
+
+<hr>
+
+<!-- ── 11. LEDs ── -->
+<section id="leds">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <h2>Block 6 — LED Indicators</h2>
+  </div>
+  <p>Place: LED1 <code>C2297</code>, LED2 <code>C2297</code>, LED3 <code>C2296</code>, R6 <code>C11702</code>, R8 <code>C11702</code>, R9 <code>C11702</code></p>
+  <pre><span class="comment">-- Power LED (always on) --</span>
+<span class="net">VUSB</span> ── R6 ── LED1 anode
+LED1 cathode ── GND
+
+<span class="comment">-- TX LED (active-low, sinks when FT232RL transmits) --</span>
+<span class="net">VUSB</span> ── R8 ── LED2 anode
+LED2 cathode ── net label <span class="net">TXLED</span>     <span class="comment">(→ U1 CBUS0)</span>
+
+<span class="comment">-- RX LED (active-low, sinks when FT232RL receives) --</span>
+<span class="net">VUSB</span> ── R9 ── LED3 anode
+LED3 cathode ── net label <span class="net">RXLED</span>     <span class="comment">(→ U1 CBUS1)</span></pre>
+  <div class="note">Anode = positive side (triangle base) · Cathode = negative side (bar)<br>
+  All resistors 1kΩ → 3 mA at 5V — well within FT232RL 6 mA sink limit.</div>
+</section>
+
+<hr>
+
+<!-- ── 12. CLEANUP ── -->
+<section id="cleanup">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <h2>Clean Up Schematic</h2>
+  </div>
+  <ol class="steps">
+    <li>Add <strong>component values</strong> to all passives (double-click → edit Value field):<br>
+      R1–R9: <code>100k, 5.1k, 10k, 5.1k, 5.1k, 1k, 10R, 1k, 1k</code><br>
+      C1–C14: <code>22µF/25V, 100n, 22µF/25V, 4.7µF, 100n, 100n, 100n, 100n, 100n, 4.7µF, 100n, 100n, 100n, 100n</code></li>
+    <li>Verify all <strong>designators</strong> match R1–R9, C1–C14, LED1–3, U1–U3, L1, D1–D2, J1–J2</li>
+    <li>Add a <strong>design note text box</strong>:
+      <pre style="margin:8px 0">FLARM USB Updater v1.0
+USB → 12V boost → FLARM RJ45
+FT232RL uses usbser.sys (no driver install)</pre></li>
+  </ol>
+</section>
+
+<hr>
+
+<!-- ── 13. ERC ── -->
+<section id="erc">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <h2>ERC — Electrical Rules Check</h2>
+  </div>
+  <ol class="steps">
+    <li><strong>Design → Electrical Rules Check</strong></li>
+    <li>Resolve all errors:<br>
+      <em>"Pin unconnected"</em> → check FT232RL unused pins have X flags<br>
+      <em>"Power pin not driven"</em> → verify VUSB net has a source (J1 VBUS)</li>
+    <li>Warnings for intentional no-connects are OK if X flags are placed</li>
+  </ol>
+  <div class="note"><strong>Target: 0 errors, 0 warnings</strong></div>
+</section>
+
+<hr>
+
+<!-- ── 14. CHECKLIST ── -->
+<section id="checklist">
+  <div class="section-header">
+    <div class="section-num">14</div>
+    <h2>Verification Checklist (before export)</h2>
+  </div>
+  <ul class="checklist">
+    <li>VBOOST connects only to: MT3608 output + C3 + C4 + D1 anode</li>
+    <li>V12_OUT connects only to: D1 cathode + J2 pin 1 + J2 pin 2</li>
+    <li>U1 TEST → GND (not NC!)</li>
+    <li>U1 CTS#, DSR#, DCD# → GND</li>
+    <li>U1 CBUS0 → TXLED net → LED2 cathode</li>
+    <li>U1 CBUS1 → RXLED net → LED3 cathode</li>
+    <li>J2 pin 3 → R7 → U1 3V3OUT</li>
+    <li>J2 pins 9, 10 (shield) → GND</li>
+    <li>D2 placed in D+/D− path between J1 and U1</li>
+    <li>R4, R5 (5.1kΩ) on CC1 and CC2 → GND</li>
+  </ul>
+</section>
+
+<hr>
+
+<!-- ── 15. EXPORT ── -->
+<section id="export">
+  <div class="section-header">
+    <div class="section-num">15</div>
+    <h2>Export</h2>
+  </div>
+  <div class="card">
+    <h3>PDF (for review)</h3>
+    <p>File → Export → Export PDF → save as <code>EasyEDA/schematic.pdf</code></p>
+  </div>
+  <div class="card">
+    <h3>BOM (for JLCPCB)</h3>
+    <p>Fabrication → BOM → Export → save as <code>Docs/bom.csv</code></p>
+  </div>
+  <div class="card">
+    <h3>Gerbers + CPL (when PCB done)</h3>
+    <p>Fabrication → Fabrication Output → save into <code>Docs/</code></p>
+  </div>
+</section>
+
+</main>
+</body>
+</html>
