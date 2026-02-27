@@ -99,9 +99,17 @@ Wiring: VUSB → 1kΩ → LED anode → cathode → TXLED#/RXLED# pin.
 
 ## Power Notes
 
-- Typical USB draw: ~210 mA (USB 2.0 / 500 mA limit OK)
-- Peak USB draw: ~380 mA (FLARM GPS acquisition)
-- Recommended: USB 3.0 port or powered hub for full margin
+**During firmware updates (primary use case):**
+- FLARM in bootloader mode: ~80mA @ 12V (GPS/radio off)
+- Total USB draw: **~280mA** — works on any USB port including USB 2.0
+
+**During full FLARM operation:**
+- PowerFLARM Core (ADS-B): 165mA @ 12V → ~510mA USB draw
+- PowerFLARM Core (Pure): 95mA @ 12V → ~340mA USB draw
+- Classic FLARM: ~85mA @ 12V → ~290mA USB draw
+- Recommended: USB-C charger (1.5A+) for sustained full-power operation
+
+See [Docs/power-analysis-options.md](Docs/power-analysis-options.md) for detailed analysis.
 
 ## Boost Converter Output
 
