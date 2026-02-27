@@ -570,24 +570,38 @@ C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="c
   </div>
   <p>Place: J1 <code>C165948</code>, D2 <code>C7519</code>, R4 <code>C25905</code>, R5 <code>C25905</code>, C14 <code>C307331</code></p>
   <pre><span class="comment">-- Power --</span>
-<span class="pin">J1 VBUS</span> ── net label <span class="net">VUSB</span>
-<span class="pin">J1 GND</span>  ── GND  <span class="comment">(all GND pins)</span>
+<span class="pin">J1 VBUS</span> (all VBUS pins) ── net label <span class="net">VUSB</span>  <span class="comment">(A4, A9, B4, B9 — tie all together)</span>
+<span class="pin">J1 GND</span>  (all GND pins)  ── GND
+<span class="pin">J1 EH</span>   (all EH pins)   ── GND             <span class="comment">(exposed housing / shield tabs)</span>
 
 <span class="comment">-- CC pull-downs (identifies as power sink) --</span>
 <span class="pin">J1 CC1</span> ── R4 ── GND               <span class="comment">(5.1kΩ)</span>
 <span class="pin">J1 CC2</span> ── R5 ── GND               <span class="comment">(5.1kΩ)</span>
 
 <span class="comment">-- USB data through ESD clamp D2 (USBLC6-2SC6) --</span>
-<span class="pin">J1 D+</span>  ── <span class="pin">D2 I/O1</span> ── <span class="pin">U1 UD+</span>
-<span class="pin">J1 D−</span>  ── <span class="pin">D2 I/O2</span> ── <span class="pin">U1 UD−</span>
-<span class="pin">D2 VCC</span> ── <span class="net">VUSB</span>
-<span class="pin">D2 GND</span> ── GND
-C14 ── <span class="net">VUSB</span> ↔ GND                 <span class="comment">(100nF bypass on D2 VCC)</span>
+<span class="comment">USB-C is reversible: DP1/DN1 = one orientation, DP2/DN2 = cable flipped.</span>
+<span class="comment">Tie BOTH pairs together → works either way, no orientation mux needed.</span>
+
+<span class="pin">J1 DP1</span> ──┐
+          ├── net label <span class="net">UD+</span>  (→ <span class="pin">D2 I/O1</span> → <span class="pin">U1 USBDP</span>)
+<span class="pin">J1 DP2</span> ──┘
+
+<span class="pin">J1 DN1</span> ──┐
+          ├── net label <span class="net">UD−</span>  (→ <span class="pin">D2 I/O2</span> → <span class="pin">U1 USBDM</span>)
+<span class="pin">J1 DN2</span> ──┘
+
+<span class="pin">D2 pin 1</span> (I/O1) ── net label <span class="net">UD+</span>
+<span class="pin">D2 pin 6</span> (I/O1) ── net label <span class="net">UD+</span>
+<span class="pin">D2 pin 3</span> (I/O2) ── net label <span class="net">UD−</span>
+<span class="pin">D2 pin 4</span> (I/O2) ── net label <span class="net">UD−</span>
+<span class="pin">D2 pin 2</span> (GND)  ── GND
+<span class="pin">D2 pin 5</span> (VBUS) ── <span class="net">VUSB</span>
+C14 ── <span class="net">VUSB</span> ↔ GND                 <span class="comment">(100nF bypass on D2 pin 5)</span>
 
 <span class="comment">-- Unused J1 pins --</span>
-<span class="pin">J1 SBU1</span>, <span class="pin">SBU2</span>        ── X
-<span class="pin">J1 D+/D− secondary</span>  ── X  <span class="comment">(USB-C has 2 pairs; only route one)</span></pre>
-  <div class="warn">USBLC6-2SC6 has a specific SOT-23-6 pin layout — verify I/O1/I/O2/VCC/GND labels match the datasheet before wiring.</div>
+<span class="pin">J1 SBU1</span>, <span class="pin">SBU2</span> ── X  <span class="comment">(sideband for alternate modes, not used)</span></pre>
+  <div class="warn">USBLC6-2SC6 pin map: 1=I/O1 · 2=GND · 3=I/O2 · 4=I/O2 · <strong>5=V_BUS (power!)</strong> · 6=I/O1. Pin 4 is NOT VCC — pin 5 is.</div>
+  <div class="note">In EasyEDA: wire DP1 and DP2 both to the same UD+ net label. Wire DN1 and DN2 both to UD−.</div>
 </section>
 
 <hr>

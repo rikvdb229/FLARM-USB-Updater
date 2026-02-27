@@ -20,6 +20,10 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 
 Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 
+**PCB:** 2000 × 1200 mils (50.8 × 30.5mm), 2-layer FR4, 1oz copper.
+Target after layout optimisation: 2000 × 950 mils (50.8 × 24.1mm).
+See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-guide.html](Docs/pcb-layout-guide.html) for full PCB layout guidance.
+
 > **Note on C-numbers:** IC and connector C-numbers are confirmed. Passive C-numbers
 > (resistors/caps) are from the JLCPCB Basic parts library and should be verified in
 > EasyEDA before ordering — search the value + package if a number doesn't match.
@@ -112,7 +116,26 @@ Output caps: C3 + C4 (22µF + 4.7µF at 25V — 2× margin over 12.36V output).
 | 5 | $2 | $8 | $21 | ~$37.50 | ~$15 | ~$83.50 | ~$16.70 |
 | 10 | $4 | $8 | $21 | ~$75 | ~$15 | ~$123 | ~$12.30 |
 
+## PCB Layout Notes
+
+Critical items verified during schematic review:
+- Boost converter wiring correct: MT3608 pin 1 = SW → L1, pin 4 = EN → R3 pull-up ✅
+- MAX3232 charge pump caps (C6–C9) correctly connected ✅
+- RJ45 pinout matches FLARM IGC specification ✅
+- FLARM protocol: 19200 baud, 8N1, no flow control — FT232RL supports this ✅
+
+**Must verify in EasyEDA schematic before ordering:**
+- FT232RL TEST pin (SSOP-28 pin 26) → GND *(mandatory — chip won't work otherwise)*
+- FT232RL CTS#, DSR#, DCD# → GND *(prevents COM port issues on Windows)*
+
+PCB routing requirements:
+- VUSB / VBOOST / SW traces: **0.5mm minimum**
+- V12_OUT traces: **0.4mm minimum**
+- USB D+ and D− routed as equal-length differential pair (target mismatch &lt; 0.5mm)
+- GND copper pour on **bottom layer only** with via stitching every 6–8mm
+
 ## Files
 
-- `EasyEDA/` — schematic and PCB design files (EasyEDA Pro JSON + PDF)
-- `Docs/` — Gerber, BOM, CPL for JLCPCB ordering
+- `EDA/` — EasyEDA Pro project file (.eprj) and netlist export
+- `Docs/schematic-drawing-guide.md` / `.html` — schematic block-by-block wiring guide
+- `Docs/pcb-layout-guide.md` / `.html` — PCB layout, trace widths, D+/D− routing, GND pour

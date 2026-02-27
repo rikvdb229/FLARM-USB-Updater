@@ -262,9 +262,9 @@ U1 CBUS4  ── X
 
 **Power:**
 ```
-J1 VBUS  ── net label VUSB
-J1 GND   ── GND
-J1 GND (all GND pins) ── GND
+J1 VBUS (all VBUS pins) ── net label VUSB   (A4, A9, B4, B9 — tie all together)
+J1 GND  (all GND pins)  ── GND
+J1 EH   (all EH pins)   ── GND              (exposed housing / shield tabs)
 ```
 
 **CC pull-downs** (signals plugged device as power sink):
@@ -276,22 +276,41 @@ R5 other side ── GND                    (5.1kΩ)
 ```
 
 **USB data through ESD clamp D2 (USBLC6-2SC6):**
+
+USB-C is reversible — there are TWO D+/D− pairs (DP1/DN1 and DP2/DN2), one for each cable orientation.
+Tie both pairs together so the device works regardless of how the cable is inserted:
+
 ```
-J1 D+  ── D2 I/O1
-J1 D−  ── D2 I/O2
-D2 I/O1 ── U1 UD+
-D2 I/O2 ── U1 UD−
-D2 VCC ── VUSB
-D2 GND ── GND
-C14 one side ── VUSB, other ── GND      (100nF bypass on D2 VCC)
+J1 DP1 ──┐
+          ├── net label UD+  (→ D2 I/O1 → U1 USBDP)
+J1 DP2 ──┘
+
+J1 DN1 ──┐
+          ├── net label UD−  (→ D2 I/O2 → U1 USBDM)
+J1 DN2 ──┘
+
+D2 pin 1 (I/O1) ── net label UD+
+D2 pin 6 (I/O1) ── net label UD+
+D2 pin 3 (I/O2) ── net label UD−
+D2 pin 4 (I/O2) ── net label UD−
+D2 pin 2 (GND)  ── GND
+D2 pin 5 (VBUS) ── VUSB
+C14 one side ── VUSB, other ── GND      (100nF bypass on D2 pin 5)
 ```
 
-> Note: USBLC6-2SC6 has a specific pin layout — verify the symbol's I/O1/I/O2/VCC/GND labels match the SOT-23-6 datasheet before wiring.
+USBLC6-2SC6 SOT-23-6 pin map:
+- Pin 1 = I/O1 (D+)
+- Pin 2 = GND
+- Pin 3 = I/O2 (D−)
+- Pin 4 = I/O2 (D−)  ← NOT VCC
+- Pin 5 = V_BUS      ← this is the VCC/power pin
+- Pin 6 = I/O1 (D+)
+
+> In EasyEDA: wire DP1 and DP2 both to the same UD+ net label. Wire DN1 and DN2 both to UD−.
 
 **Unused J1 pins:**
 ```
-J1 SBU1, SBU2 ── X (no-connect)
-J1 D+ and D− on secondary side ── X (USB-C has 2 pairs; only route one)
+J1 SBU1, SBU2 ── X (no-connect — sideband for alternate modes, not used)
 ```
 
 ---
