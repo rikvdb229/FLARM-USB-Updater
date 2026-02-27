@@ -129,9 +129,10 @@ Critical items verified during schematic review:
 - FT232RL CTS#, DSR#, DCD# → GND *(prevents COM port issues on Windows)*
 
 PCB routing requirements:
-- VUSB / VBOOST / SW traces: **0.5mm minimum**
-- V12_OUT traces: **0.4mm minimum**
-- USB D+ and D− routed as equal-length differential pair (target mismatch &lt; 0.5mm)
+- VUSB / VBOOST / SW traces: **20mil**
+- V12_OUT traces: **15mil**
+- Signal traces (UART, RS232, LED, USB D+/D−): **10mil** (EasyEDA default)
+- USB D+ and D− routed as equal-length differential pair (target mismatch < 20mil)
 - GND copper pour on **bottom layer only** with via stitching every 6–8mm
 
 ## Files

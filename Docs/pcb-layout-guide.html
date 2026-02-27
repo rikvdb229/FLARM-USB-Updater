@@ -279,7 +279,7 @@
     </div>
     <div class="pri-row">
       <div class="pri-dot y"></div>
-      <div class="pri-label">Power traces ≥ 0.5mm (VUSB, VBOOST, SW)</div>
+      <div class="pri-label">Power traces ≥ 20mil (VUSB, VBOOST, SW)</div>
       <div class="pri-desc">Prevents voltage drop and trace heating at 380–500mA. Critical for reliable FLARM operation.</div>
     </div>
     <div class="pri-row">
@@ -463,14 +463,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td><code>VUSB</code></td><td>500mA</td><td>0.4mm</td><td class="hi">0.5mm</td><td>USB power rail</td></tr>
-        <tr><td><code>VBOOST</code></td><td>~2A peak</td><td>0.5mm</td><td class="hi">0.5mm</td><td>MT3608 switching output</td></tr>
-        <tr><td><code>$1N2860</code> (SW)</td><td>~2A peak</td><td>0.5mm</td><td class="hi">0.5mm</td><td>MT3608 SW → L1, highest priority</td></tr>
-        <tr><td><code>V12_OUT</code></td><td>380mA</td><td>0.3mm</td><td class="med">0.4mm</td><td>12V to FLARM via RJ45</td></tr>
-        <tr><td><code>UART_TX</code> / <code>UART_RX</code></td><td>&lt;1mA</td><td>0.15mm</td><td class="ok">0.2mm</td><td>FT232RL ↔ MAX3232</td></tr>
-        <tr><td><code>RS232_TX</code> / <code>RS232_RX</code></td><td>&lt;1mA</td><td>0.15mm</td><td class="ok">0.2mm</td><td>MAX3232 ↔ RJ45</td></tr>
-        <tr><td><code>UD+</code> / <code>UD−</code></td><td>signal</td><td>0.15mm</td><td class="ok">0.2mm</td><td>Matched pair — see §3</td></tr>
-        <tr><td><code>TXLED</code> / <code>RXLED</code> / LEDs</td><td>3mA</td><td>0.15mm</td><td class="ok">0.2mm</td><td>LED drive signals</td></tr>
+        <tr><td><code>VUSB</code></td><td>500mA</td><td>15mil</td><td class="hi">20mil</td><td>USB power rail</td></tr>
+        <tr><td><code>VBOOST</code></td><td>~2A peak</td><td>20mil</td><td class="hi">20mil</td><td>MT3608 switching output</td></tr>
+        <tr><td><code>$1N2860</code> (SW)</td><td>~2A peak</td><td>20mil</td><td class="hi">20mil</td><td>MT3608 SW → L1, highest priority</td></tr>
+        <tr><td><code>V12_OUT</code></td><td>380mA</td><td>10mil</td><td class="med">15mil</td><td>12V to FLARM via RJ45</td></tr>
+        <tr><td><code>UART_TX</code> / <code>UART_RX</code></td><td>&lt;1mA</td><td>6mil</td><td class="ok">10mil</td><td>FT232RL ↔ MAX3232</td></tr>
+        <tr><td><code>RS232_TX</code> / <code>RS232_RX</code></td><td>&lt;1mA</td><td>6mil</td><td class="ok">10mil</td><td>MAX3232 ↔ RJ45</td></tr>
+        <tr><td><code>UD+</code> / <code>UD−</code></td><td>signal</td><td>6mil</td><td class="ok">10mil</td><td>Matched pair — see §3</td></tr>
+        <tr><td><code>TXLED</code> / <code>RXLED</code> / LEDs</td><td>3mA</td><td>6mil</td><td class="ok">10mil</td><td>LED drive signals</td></tr>
         <tr><td><code>GND</code></td><td>all combined</td><td>—</td><td class="ok">pour</td><td>Bottom layer copper pour only</td></tr>
       </tbody>
     </table>
@@ -479,8 +479,8 @@
   <h3>How to set net widths in EasyEDA Pro</h3>
   <ol class="step-list">
     <li>In PCB editor: <strong>Design → Design Rule → Net Class</strong></li>
-    <li>Create class <code>POWER</code> → assign nets: <code>VUSB</code>, <code>VBOOST</code>, <code>$1N2860</code> → Width: <strong>0.5mm</strong></li>
-    <li>Create class <code>POWER_12V</code> → assign net: <code>V12_OUT</code> → Width: <strong>0.4mm</strong></li>
+    <li>Create class <code>POWER</code> → assign nets: <code>VUSB</code>, <code>VBOOST</code>, <code>$1N2860</code> → Width: <strong>20mil</strong></li>
+    <li>Create class <code>POWER_12V</code> → assign net: <code>V12_OUT</code> → Width: <strong>15mil</strong></li>
     <li>Or manually: route trace → right-click → <em>Select Connected Copper</em> → Properties → change width</li>
     <li>Re-run DRC to confirm no violations</li>
   </ol>
@@ -508,7 +508,7 @@
         <tr><td>Max skew</td><td>~400 ps</td></tr>
         <tr><td>FR4 propagation speed</td><td>~180 mm/ns</td></tr>
         <tr><td>Max length mismatch (spec)</td><td>~72mm</td></tr>
-        <tr><td><strong>Target for this board</strong></td><td><strong>&lt; 0.5mm mismatch</strong></td></tr>
+        <tr><td><strong>Target for this board</strong></td><td><strong>&lt; 20mil mismatch</strong></td></tr>
         <tr><td>Typical route length on 50mm board</td><td>15–20mm</td></tr>
       </tbody>
     </table>
@@ -520,17 +520,17 @@
     <li>Route → Interactive Router → enable <strong>Differential Pair</strong> in the toolbar</li>
     <li>Click on UD+ net at J1 — EasyEDA automatically routes both D+ and D− together</li>
     <li>Route from J1 → D2 → U1 in one continuous move</li>
-    <li>Keep pair spacing ≤ 0.15mm (traces may touch — fine for USB 2.0)</li>
+    <li>Keep pair spacing ≤ 6mil (traces may touch — fine for USB 2.0)</li>
     <li>Both traces on <strong>same layer, no vias</strong></li>
   </ol>
 
   <h3>Option B — Manual with length check</h3>
   <ol class="step-list">
-    <li>Route D+ (UD+) from J1 → D2 → U1 normally at 0.2mm</li>
+    <li>Route D+ (UD+) from J1 → D2 → U1 normally at 10mil</li>
     <li>Route D− (UD−) the same path, keeping it alongside D+</li>
     <li>Select D+ trace → Properties → note <em>Length</em></li>
     <li>Select D− trace → Properties → note <em>Length</em></li>
-    <li>If mismatch &gt; 0.5mm: add serpentine meander on the shorter trace (Insert → Trace)</li>
+    <li>If mismatch &gt; 20mil: add serpentine meander on the shorter trace (Insert → Trace)</li>
   </ol>
 
   <div class="callout">
@@ -562,7 +562,7 @@
 
       <!-- SW trace (wide, highlighted) -->
       <line x1="150" y1="62" x2="200" y2="62" stroke="#f9a825" stroke-width="4"/>
-      <text x="175" y="54" text-anchor="middle" fill="#f9a825" font-size="8" font-weight="700">SW 0.5mm</text>
+      <text x="175" y="54" text-anchor="middle" fill="#f9a825" font-size="8" font-weight="700">SW 20mil</text>
       <text x="175" y="82" text-anchor="middle" fill="#7a5a10" font-size="7">≤5mm</text>
 
       <!-- L1 -->
@@ -572,7 +572,7 @@
 
       <!-- L1 to D1 trace -->
       <line x1="250" y1="62" x2="290" y2="62" stroke="#f9a825" stroke-width="4"/>
-      <text x="270" y="54" text-anchor="middle" fill="#f9a825" font-size="7">0.5mm</text>
+      <text x="270" y="54" text-anchor="middle" fill="#f9a825" font-size="7">20mil</text>
 
       <!-- D1 -->
       <rect x="290" y="48" width="40" height="28" rx="3" fill="#1e1200" stroke="#f9a825" stroke-width="1.5"/>
@@ -581,7 +581,7 @@
 
       <!-- D1 to VBOOST -->
       <line x1="330" y1="62" x2="370" y2="62" stroke="#f9a825" stroke-width="4"/>
-      <text x="350" y="54" text-anchor="middle" fill="#f9a825" font-size="7">0.5mm</text>
+      <text x="350" y="54" text-anchor="middle" fill="#f9a825" font-size="7">20mil</text>
 
       <!-- VBOOST label -->
       <text x="375" y="50" fill="#f9a825" font-size="9" font-weight="600">VBOOST</text>
@@ -616,9 +616,9 @@
 
   <h3>Placement rules</h3>
   <ul class="checklist">
-    <li>U3 SW pin → L1: trace ≤ 5mm, width 0.5mm <span class="tag red">HIGHEST PRIORITY TRACE</span></li>
-    <li>L1 output → D1 anode: ≤ 5mm, width 0.5mm</li>
-    <li>D1 cathode → C3: ≤ 5mm, width 0.5mm</li>
+    <li>U3 SW pin → L1: trace ≤ 5mm, width 20mil <span class="tag red">HIGHEST PRIORITY TRACE</span></li>
+    <li>L1 output → D1 anode: ≤ 5mm, width 20mil</li>
+    <li>D1 cathode → C3: ≤ 5mm, width 20mil</li>
     <li>R1 + R2 (FB divider) within 5mm of U3 FB pin (pin 3)</li>
     <li>C1 + C2 (Vin caps) within 3mm of U3 VIN pin (pin 5)</li>
     <li>GND via directly adjacent to U3 GND pin (pin 2)</li>
@@ -640,7 +640,7 @@
     <li><strong>Place → Copper Pour</strong> (or shortcut: Shift+P in PCB editor)</li>
     <li>Set Layer: <strong>Bottom (B.Cu)</strong></li>
     <li>Set Net: <strong>GND</strong></li>
-    <li>Set Clearance: <strong>0.2mm</strong></li>
+    <li>Set Clearance: <strong>8mil</strong></li>
     <li>Set Fill: <strong>Solid</strong></li>
     <li>Click to trace around the full board outline → double-click to close</li>
     <li>EasyEDA fills the pour automatically — click <em>Rebuild All Copper Pour</em> if needed</li>
@@ -659,18 +659,18 @@
 <section id="routing-order">
   <h2>6. Recommended Routing Order</h2>
   <ol class="step-list">
-    <li><strong>VUSB (0.5mm)</strong> — J1 VBUS → C1 → C14 → U1 VCC (pins 4+20) → U2 VCC (pin 16) → U3 VIN (pin 5)</li>
+    <li><strong>VUSB (20mil)</strong> — J1 VBUS → C1 → C14 → U1 VCC (pins 4+20) → U2 VCC (pin 16) → U3 VIN (pin 5)</li>
     <li><strong>GND star</strong> — short GND connections from each IC GND pin to nearest via (bottom pour handles the rest)</li>
-    <li><strong>Boost switching loop (0.5mm)</strong> — U3 SW → L1 → D1 → VBOOST (keep tight and compact)</li>
-    <li><strong>V12_OUT (0.4mm)</strong> — D1 cathode → C3/C4 → R1 top → RJ1 pins 1+2</li>
-    <li><strong>D+/D− differential pair (0.2mm matched)</strong> — J1 → D2 → U1 USBDP/USBDM</li>
-    <li><strong>UART_TX / UART_RX (0.2mm)</strong> — U1 pin 1 → U2 pin 11 (TX) · U2 pin 12 → U1 pin 5 (RX)</li>
-    <li><strong>RS232_TX / RS232_RX (0.2mm)</strong> — U2 T1OUT → RJ1 pin 6 · RJ1 pin 5 → U2 R1IN</li>
-    <li><strong>3V3OUT / R7 (0.2mm)</strong> — U1 3V3OUT → C12 → R7 → RJ1 pin 3</li>
-    <li><strong>LED nets (0.2mm)</strong> — U1 CBUS0 → LED2 cathode · U1 CBUS1 → LED3 cathode · VUSB → R6/R8/R9 → LED anodes</li>
-    <li><strong>Feedback + EN (0.2mm)</strong> — VBOOST → R1 → $1N2875 ← R2 ← GND · $1N2875 → U3 FB · $1N2847 → U3 EN ← R3 ← VUSB</li>
-    <li><strong>CC pull-downs (0.2mm)</strong> — J1 CC1/CC2 → R4/R5 → GND</li>
-    <li><strong>Add GND copper pour</strong> — bottom layer, full board, clearance 0.2mm</li>
+    <li><strong>Boost switching loop (20mil)</strong> — U3 SW → L1 → D1 → VBOOST (keep tight and compact)</li>
+    <li><strong>V12_OUT (15mil)</strong> — D1 cathode → C3/C4 → R1 top → RJ1 pins 1+2</li>
+    <li><strong>D+/D− differential pair (10mil matched)</strong> — J1 → D2 → U1 USBDP/USBDM</li>
+    <li><strong>UART_TX / UART_RX (10mil)</strong> — U1 pin 1 → U2 pin 11 (TX) · U2 pin 12 → U1 pin 5 (RX)</li>
+    <li><strong>RS232_TX / RS232_RX (10mil)</strong> — U2 T1OUT → RJ1 pin 6 · RJ1 pin 5 → U2 R1IN</li>
+    <li><strong>3V3OUT / R7 (10mil)</strong> — U1 3V3OUT → C12 → R7 → RJ1 pin 3</li>
+    <li><strong>LED nets (10mil)</strong> — U1 CBUS0 → LED2 cathode · U1 CBUS1 → LED3 cathode · VUSB → R6/R8/R9 → LED anodes</li>
+    <li><strong>Feedback + EN (10mil)</strong> — VBOOST → R1 → $1N2875 ← R2 ← GND · $1N2875 → U3 FB · $1N2847 → U3 EN ← R3 ← VUSB</li>
+    <li><strong>CC pull-downs (10mil)</strong> — J1 CC1/CC2 → R4/R5 → GND</li>
+    <li><strong>Add GND copper pour</strong> — bottom layer, full board, clearance 8mil</li>
     <li><strong>Add via stitching</strong> — GND net, 0.8mm drill, every 6–8mm</li>
     <li><strong>Run DRC</strong> — fix all violations before Gerber export</li>
   </ol>
@@ -701,12 +701,12 @@
   <h2>8. Pre-Order Checklist</h2>
   <ul class="checklist">
     <li>DRC passes with zero violations</li>
-    <li>D+ and D− trace lengths within 0.5mm of each other</li>
-    <li>VUSB, VBOOST, SW traces all ≥ 0.5mm wide</li>
-    <li>V12_OUT traces ≥ 0.4mm wide</li>
+    <li>D+ and D− trace lengths within 20mil of each other</li>
+    <li>VUSB, VBOOST, SW traces all ≥ 20mil wide</li>
+    <li>V12_OUT traces ≥ 15mil wide</li>
     <li>Boost switching loop (U3→L1→D1→C3) is compact — SW trace ≤ 5mm</li>
     <li>No signal traces routed through the boost converter zone</li>
-    <li>Bottom layer GND copper pour covers full board, clearance 0.2mm</li>
+    <li>Bottom layer GND copper pour covers full board, clearance 8mil</li>
     <li>GND vias stitched every 6–8mm</li>
     <li>All component courtyards ≥ 0.5mm from board edge</li>
     <li>Board outline: 2000 × 950 mils (or confirmed size based on RJ45 courtyard)</li>
