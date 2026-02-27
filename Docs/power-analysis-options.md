@@ -438,6 +438,121 @@ from USB — well within real-world USB capability.
 
 ---
 
+## 9. Boost Converter Alternatives — Is There Something Better Than MT3608?
+
+### SOT23-6 Drop-in Replacements (Same Footprint)
+
+| IC | Notes | Efficiency vs MT3608 |
+|---|---|---|
+| SDB628 / B6286 | Clone, same datasheet | Identical |
+| SX1308 | Clone, same datasheet | Identical |
+| FP6291 | 2A, 1MHz | Similar |
+
+**These are all the same design with different labels.** No efficiency improvement.
+
+### Synchronous Upgrade: TPS61088 (QFN-20)
+
+The only meaningful efficiency gain requires switching to a **synchronous** boost
+(integrated rectifier MOSFET instead of external Schottky diode):
+
+| Parameter | MT3608 (current) | TPS61088 (upgrade) |
+|---|---|---|
+| Topology | Asynchronous | **Synchronous** |
+| Switch Rdson | 80–150mΩ | **11mΩ** |
+| Rectifier | External Schottky D1 | **Internal 13mΩ MOSFET** |
+| Real efficiency 5V→12V | 85–88% | **90–93%** |
+| Package | SOT23-6 | **QFN-20 (4.5×3.5mm)** |
+| Switch current | 2A | **10A** |
+| Output power | ~3W practical | **30W** |
+| LCSC price | ~$0.08 | ~$0.50 |
+
+**Verdict:** Real improvement, but requires PCB redesign (different footprint).
+Eliminates D1, reduces heat. **Best candidate for a v2 board.** Not worth it for
+v1 where the MT3608 already handles the 2W FLARM load comfortably.
+
+### ICs Investigated But NOT Suitable for 12V Output
+
+| IC | Why Not |
+|---|---|
+| TPS61023 / TPS61022 | Max output 5.5V — can't reach 12V |
+| TPS61032 | Max output 5.5V, TSSOP-16, low LCSC stock |
+| FP6298 | Max output 9V, SOP-8 package |
+| SY8303 | Step-DOWN (buck) converter, not boost |
+| ME2149 | Low current, designed for low-power only |
+
+### Conclusion: MT3608 is the Right Choice for v1
+
+For a SOT23-6 boost to 12V, the MT3608 is effectively the only game in town.
+Its clones offer no improvement. A real upgrade requires moving to a synchronous
+topology (TPS61088) with a different package — save that for v2.
+
+---
+
+## 10. USB-C Can Deliver More Power — Options
+
+### What the Current Design Gets (5.1K CC Pull-downs)
+
+| Source Type | Rp Pull-up | Current Available | Works? |
+|---|---|---|---|
+| USB-A port (via A→C cable) | None | 500mA | Firmware updates: YES |
+| USB-C laptop (default) | 56K | 500mA/900mA | Firmware updates: YES |
+| USB-C laptop (high power) | 22K | 1.5A | Everything: YES |
+| USB-C phone charger | 10K or 22K | 1.5A–3.0A | Everything: YES |
+| USB-C PD charger | PD negotiation | 1.5A–5A | Everything: YES |
+
+Most USB-C chargers provide 1.5A+ even without PD negotiation, because they use
+22K or 10K Rp pull-ups. The board's existing 5.1K Rd pull-downs are sufficient.
+
+### USB BC 1.2 DCP — NOT Applicable
+
+BC 1.2 DCP works by shorting D+ to D-. This board **needs D+/D- for FT232RL
+serial data transfer**. BC 1.2 is for charger-only devices. Not usable here.
+
+### v2 Option: STUSB4500 USB PD Sink (Negotiate 12V Directly)
+
+The STUSB4500 (LCSC C2678061, ~$0.75, QFN-24) is an autonomous USB PD sink
+controller that negotiates voltage from a PD charger **without any MCU**:
+
+```
+USB-C PD charger → STUSB4500 negotiates 12V → Direct to RJ45 pins 1,2
+                    No boost converter needed! 100% efficient.
+Fallback: If source only offers 5V → MT3608 boost as backup
+```
+
+Configuration is stored in NVM (40 bytes, programmed once via I2C during
+manufacturing). The IC has indicator pins for PDO selection (drive LEDs).
+
+**For v2:** This would allow a dual-path design:
+- PD charger available → 12V direct → zero loss
+- Non-PD source → MT3608 fallback → current design
+- Net result: works everywhere, optimal efficiency with PD chargers
+
+---
+
+## 11. Additional Schematic/PCB Improvements
+
+### Missing From Current Design
+
+| Item | Priority | Description |
+|---|---|---|
+| **No mounting holes** | MEDIUM | Add 2× M2 mounting holes at opposite corners for enclosure |
+| **No test points** | LOW | Add test pads: V12_OUT, 3.3V, GND for debugging with multimeter |
+| **No ferrite bead on VUSB** | LOW | A 600Ω@100MHz ferrite between USB VBUS and analog VCC would reduce switching noise on FT232RL. Optional — FT232RL has internal filtering. |
+| **No EEPROM footprint** | LOW | FT232RL uses internal EEPROM with factory defaults (VID/PID, 19200 baud). Add unpopulated 93C46 footprint only if custom VID/PID or serial number is needed. Not required for current use case. |
+
+### Confirmed Good (No Changes Needed)
+
+| Item | Status |
+|---|---|
+| RJ45 shield (pins 9,10) to GND | Correct |
+| Input caps (C1 22µF + C2 100nF) | Adequate for 2W load |
+| Output caps (C3 22µF + C4 4.7µF at 25V) | Good — 2× voltage margin |
+| All bypass caps present | 7× 100nF on all IC VCC pins |
+| Power-on sequencing | MT3608 EN pulled high via R3 — 12V ramps up in ~4ms (soft-start). FT232RL initializes in ~100ms. No conflict. |
+| RS232 TX/RX routing | Adequate separation, low-speed (19200 baud) |
+
+---
+
 ## Appendix A: Resistor Values for Different Output Voltages
 
 Using R2 = 5.1K (fixed), Vref = 0.6V, D1 Vf = 0.36V:
@@ -477,3 +592,10 @@ Custom PCB designs with proper layout may achieve 2-3% better than cheap modules
 - [USB BC 1.2 Overview (Analog Devices)](https://www.analog.com/en/resources/technical-articles/overview-of-usb-battery-charging-revision-12-and-the-important-role-of-charger-detectors.html) — Charging port detection
 - [USB-C CC Resistors (Hackaday)](https://hackaday.com/2023/01/04/all-about-usb-c-resistors-and-emarkers/) — CC voltage divider
 - [USB Power on Motherboards (USB-IF)](https://www.usb.org/sites/default/files/power_delivery_motherboards.pdf) — OCP implementation
+- [TPS61088 Datasheet (TI)](https://www.ti.com/product/TPS61088) — Synchronous boost, 10A switch, QFN-20
+- [TPS61088 Review (DONE.LAND)](https://done.land/components/power/powersupplies/dc-dc-converters/boost/tps61088/) — Real performance data
+- [STUSB4500 Datasheet (ST)](https://www.st.com/resource/en/datasheet/stusb4500.pdf) — Autonomous USB PD sink, QFN-24
+- [STUSB4500 on LCSC (C2678061)](https://www.lcsc.com/product-detail/C2678061.html) — JLCPCB-compatible
+- [STUSB4500 GitHub](https://github.com/usb-c/STUSB4500) — NVM configuration tools
+- [USB BC 1.2 Overview (Analog Devices)](https://www.analog.com/en/resources/technical-articles/overview-of-usb-battery-charging-revision-12-and-the-important-role-of-charger-detectors.html) — DCP/CDP/SDP detection
+- [Synchronous Boost (Analog Devices)](https://www.analog.com/en/resources/technical-articles/synchronous-boost-converters-provide-high-voltage-without-the-heat.html) — Why synchronous is better
