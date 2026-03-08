@@ -211,7 +211,7 @@ Route in this order to avoid having to re-route:
 5. **D+/D−** — J1 → D2 → U1 as differential pair (10mil matched)
 6. **UART_TX / UART_RX** — U1 → U2 (10mil)
 7. **RS232_TX / RS232_RX** — U2 → RJ1 pins 5&6 (10mil)
-8. **3V3OUT / R7** — U1 3V3OUT → R7 → RJ1 pin 3 (10mil)
+8. **V3V3 / R7** — U4 Vout → R7 → RJ1 pin 3 (10mil)
 9. **LED nets** — TXLED / RXLED from U1 → LED cathodes (10mil)
 10. **Power LEDs** — VUSB → R6/R8/R9 → LED anodes (10mil)
 11. **Feedback divider** — VBOOST → R1 → R2 → GND, junction → U3 FB (10mil)
@@ -237,7 +237,73 @@ Before generating Gerbers, run DRC with these constraints:
 
 ---
 
-## 10. Pre-Order Checklist
+## 10. Mounting Holes
+
+Add 2× plated mounting holes at opposite corners (top-left and bottom-right, or top-right and bottom-left). These allow securing the board with standoffs in a case or to a surface.
+
+| Parameter | Value |
+|-----------|-------|
+| Hole size | M2.5 (2.5mm drill, 4.5mm pad) |
+| Net | GND (connects shield to ground plane) |
+| Clearance from board edge | ≥ 1.5mm from pad edge to board outline |
+| Placement | ≥ 3mm from nearest component courtyard |
+
+**In EasyEDA Pro:** Place → Pad → set drill to 2.5mm, pad to 4.5mm, shape Round, net GND. Place at opposite corners inside the board outline.
+
+---
+
+## 11. Test Points
+
+Add small test pads for first-board bring-up with a multimeter. Costs nothing in BOM, negligible PCB space.
+
+| Test Point | Net | Expected Voltage |
+|------------|-----|-----------------|
+| TP1 | VUSB | 5.0V |
+| TP2 | VBOOST | ~12.4V |
+| TP3 | V12_OUT | ~12.0V |
+| TP4 | V3V3 | 3.3V |
+| TP5 | GND | 0V (probe reference) |
+
+**In EasyEDA Pro:** Place → Pad → 1.0mm round pad, no drill (SMD), assign net. Place in a row along a board edge where they won't interfere with components. Label each with its net name in silkscreen.
+
+---
+
+## 12. Breakout Headers (J3, J4)
+
+Two through-hole headers for optional hand-soldering. Leave unpopulated on assembled boards.
+
+**J3 — MAX3232 Channel 2 (1×4, 2.54mm pitch)**
+- Place near U2 (MAX3232), along the bottom board edge
+- Pin labels in silkscreen: `T2I`, `T2O`, `R2I`, `R2O`
+- Pads: 1.0mm drill, 1.8mm pad, 2.54mm pitch
+
+**J4 — TTL UART (1×3, 2.54mm pitch)**
+- Place near U1 (FT232RL), along the bottom board edge
+- Pin labels in silkscreen: `TX`, `RX`, `GND`
+- Pads: 1.0mm drill, 1.8mm pad, 2.54mm pitch
+
+**In EasyEDA Pro:** Place → Pad → set drill 1.0mm, pad 1.8mm, shape Round. Place 4 pads at 2.54mm spacing for J3, 3 pads for J4. Assign nets manually. Add silkscreen text labels.
+
+> These headers are not in the JLCPCB BOM — they are hand-soldered when needed.
+
+---
+
+## 13. Silkscreen Design
+
+Add these labels to the top silkscreen layer:
+
+- **Board identity**: `FLARM USB Updater v1.0` (center of board or near title area)
+- **Connector labels**: `USB` near J1, `FLARM` near J2
+- **LED labels**: `PWR`, `TX`, `RX` next to LED1, LED2, LED3
+- **Voltage warning**: `12V` near RJ45 pins 1,2 area
+- **Pin 1 dots**: on all IC packages (U1–U4)
+- **Polarity marks**: `+` on polarized caps (C1, C3, C10, C15, C16) and D1 cathode band
+
+**Text size:** minimum 0.8mm height / 0.15mm line width for JLCPCB legibility.
+
+---
+
+## 14. Pre-Order Checklist
 
 - [ ] DRC passes with zero violations
 - [ ] D+ and D− trace lengths within 20mil of each other
@@ -250,5 +316,9 @@ Before generating Gerbers, run DRC with these constraints:
 - [ ] All component courtyard clearances ≥ 0.5mm from board edge
 - [ ] Board outline correct (2000 × 950 mils or confirmed size)
 - [ ] Schematic: TEST, CTS#, DSR#, DCD# all tied to GND
+- [ ] Mounting holes placed at opposite corners (M2.5, GND net)
+- [ ] Test points TP1–TP5 placed and labeled
+- [ ] Silkscreen: board name, connector labels, LED labels, voltage warnings
+- [ ] Breakout headers J3 (1×4) and J4 (1×3) placed along bottom edge with labels
 - [ ] Gerber export: all layers including drill file
 - [ ] JLCPCB online Gerber viewer shows no missing copper or short circuits
