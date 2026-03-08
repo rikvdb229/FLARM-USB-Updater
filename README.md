@@ -14,7 +14,7 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 - USB ESD protection (USBLC6-2SC6) on D+/D−
 - USB-C connector with proper CC pull-downs
 - Power, TX and RX LED indicators
-- RJ45 pin 3 (3.3V display power) driven from FT232RL 3V3OUT — powers FLARM displays during display firmware updates
+- Dedicated AMS1117-3.3 LDO — 3.3V supply for FLARM display power (RJ45 pin 3), up to 800mA
 
 ## Hardware
 
@@ -35,6 +35,7 @@ See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-gu
 | U1 | FT232RL USB-UART SSOP-28 | C8690 | Extended |
 | U2 | MAX3232CSE+T RS232 transceiver | C7258 | Extended |
 | U3 | MT3608 boost converter | C84817 | Extended |
+| U4 | AMS1117-3.3 LDO regulator SOT-223 | C6186 | Basic |
 | L1 | 22µH shielded inductor 1A | C135264 | Extended |
 | D1 | B5819W SL Schottky 40V/1A SOD-123 | C8598 | Basic |
 | D2 | USBLC6-2SC6 USB ESD clamp | C7519 | Extended |
@@ -66,25 +67,59 @@ See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-gu
 | C12 | 100nF 0402 — FT232RL 3V3OUT | C307331 | Basic |
 | C13 | 100nF 0402 — FT232RL VCCIO | C307331 | Basic |
 | C14 | 100nF 0402 — USBLC6 VCC | C307331 | Basic |
+| C15 | 22µF / 25V 0805 — AMS1117 Vin | C45783 | Basic |
+| C16 | 22µF / 25V 0805 — AMS1117 Vout | C45783 | Basic |
 
-**32 components — 7 Extended parts ($21 in JLCPCB setup fees)**
+**35 components — 7 Extended parts ($21 in JLCPCB setup fees)**
 
-Unique passive C-numbers: only 6 distinct parts cover all 25 passives.
+Unique passive C-numbers: only 6 distinct parts cover all 28 passives.
 
 ### FLARM RJ45 Pinout (8P8C shielded)
 
 | Pin | Signal | This device |
 |-----|--------|-------------|
 | 1, 2 | +12V | From boost via D1 (~12.0V) |
-| 3 | FLARM 3V3 | From FT232RL 3V3OUT via R7 (10Ω) |
+| 3 | FLARM 3V3 | From AMS1117-3.3 (U4) via R7 (10Ω) |
 | 4, 7, 8 | GND | PCB GND |
 | 5 | FLARM TX | RS232 RX input |
 | 6 | FLARM RX | RS232 TX output |
 | 9, 10 | Shield | PCB GND copper pour |
 
-**Pin 3 note:** R7 (10Ω) always populated — bridges FT232RL 3V3OUT to RJ45 pin 3.
-- FLARM update: FLARM drives pin 3 itself; R7 limits any current mismatch. Safe.
-- Display update: FT232RL 3V3OUT (50mA max) powers display via R7. Display current draw is low (~10–25mA); voltage drop across R7 is negligible. FT232RL 3V3OUT is sufficient.
+**Pin 3 note:** R7 (10Ω) always populated — bridges AMS1117-3.3 output (U4) to RJ45 pin 3.
+- FLARM update: FLARM drives pin 3 itself; R7 limits any current mismatch between LDO and FLARM's 3.3V. Safe — both sources are ~3.3V, backfeed through 10Ω is negligible.
+- Display update: AMS1117-3.3 (800mA capable) powers display via R7. More than sufficient for any FLARM display.
+
+**Display updates — TX/RX crossover cable:** For display firmware updates, TX and RX
+are swapped relative to FLARM updates. Use a crossover RJ45 cable (pins 5 and 6 swapped)
+labeled "DISPLAY". RS232 is non-damaging if crossed — receivers are high-impedance.
+No board changes needed.
+
+### Breakout Headers (unpopulated)
+
+Two through-hole headers for optional hand-soldering. Not assembled by JLCPCB — solder a pin header when needed.
+
+**J3 — MAX3232 Channel 2 (1×4, 2.54mm)**
+
+Exposes the unused second RS232 channel. All four pins brought out:
+
+| Pin | Signal | Type |
+|-----|--------|------|
+| 1 | T2IN | TTL input → RS232 output on pin 2 |
+| 2 | T2OUT | RS232 output |
+| 3 | R2IN | RS232 input → TTL output on pin 4 |
+| 4 | R2OUT | TTL output |
+
+Example: jumper J3 pin 1 to J4 pin 1 (UART_TX) → J3 pin 2 becomes a second RS232 TX output (serial tap).
+
+**J4 — TTL UART (1×3, 2.54mm)**
+
+Exposes the TTL-level UART signals (between FT232RL and MAX3232). Useful for connecting devices that speak TTL serial directly, bypassing RS232.
+
+| Pin | Signal | Description |
+|-----|--------|-------------|
+| 1 | TX | 5V TTL TX from FT232RL |
+| 2 | RX | 5V TTL RX to FT232RL |
+| 3 | GND | Signal reference |
 
 ### LED Indicators
 
@@ -96,6 +131,32 @@ Unique passive C-numbers: only 6 distinct parts cover all 25 passives.
 
 TXLED# and RXLED# are active-low, default CBUS0/CBUS1 factory config — no EEPROM needed.
 Wiring: VUSB → 1kΩ → LED anode → cathode → TXLED#/RXLED# pin.
+
+## What Else Can It Do?
+
+With the FLARM cable connected, this board provides full RS232 + power — not just firmware updates:
+
+- **IGC flight log download** — open FLARM Tool, download flight logs for OLC/competition submission. No separate 12V supply needed.
+- **FLARM configuration** — change aircraft type, competition ID, NMEA output sentences, baud rate, and other settings via the serial link.
+- **Live NMEA diagnostics** — open a serial terminal (PuTTY, Tera Term) at 19200 baud to watch GPS, traffic, and error sentences in real-time. Useful for bench testing or troubleshooting.
+- **General-purpose RS232 adapter** — make an RJ45 cable with only GND (pins 4/7/8), TX (pin 5), and RX (pin 6) connected. Leave pins 1/2 (12V) and 3 (3.3V) unconnected. The boost converter idles at ~1mA with no load. Works at any baud rate the FT232RL supports (300–3M baud).
+
+## Cable Configurations
+
+| Cable | Wiring | Use |
+|-------|--------|-----|
+| **FLARM** (straight) | All pins 1:1 | Firmware update, config, IGC download, diagnostics |
+| **DISPLAY** (crossover) | Pins 5 ↔ 6 swapped | Display firmware update |
+| **RS232 only** | Pins 4, 5, 6, 7, 8 only | General RS232 (no 12V/3.3V) |
+
+## FT232RL EEPROM Customization (optional)
+
+Use FTDI's free **FT_PROG** tool (Windows) to program the FT232RL's internal EEPROM:
+
+- **Device description**: set to "FLARM USB Updater" — shows in Device Manager instead of generic "USB Serial Converter"
+- **Serial number**: unique per board — helps identify the right COM port when multiple FTDI devices are connected
+
+One-time USB programming step per board. Not required for basic operation.
 
 ## Power Notes
 
