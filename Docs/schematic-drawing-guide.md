@@ -31,9 +31,9 @@ Follow **left-to-right signal flow** and **top-to-bottom power flow** — the tw
 │                                                                     │
 │  [J1 USB-C]    [FT232RL U1]    [MAX3232 U2]    [J2 RJ45]           │
 │  [D2 USBLC6]   [C10-C13]      [C5-C9]         [R7]                 │
-│  [R4, R5]                                                           │
-│  [C14]                                                              │
-│   USB-C         USB-UART        RS232           CONNECTOR           │
+│  [R4, R5]                                      [U4 AMS1117-3.3]    │
+│  [C14]                                         [C15, C16]           │
+│   USB-C         USB-UART        RS232           CONNECTOR + LDO    │
 │   (left)        (centre-left)   (centre-right)  (right)            │
 │                                                                     │
 │              [LED1 LED2 LED3 + R6 R8 R9]                           │
@@ -114,6 +114,7 @@ Use these names exactly (case-sensitive) for net labels:
 | `UART_RX` | FT232RL RXD ← MAX3232 R1OUT |
 | `RS232_TX` | MAX3232 T1OUT → RJ45 pin 6 |
 | `RS232_RX` | MAX3232 R1IN ← RJ45 pin 5 |
+| `V3V3` | AMS1117-3.3 output (3.3V to RJ45 pin 3) |
 
 ---
 
@@ -183,10 +184,10 @@ U2 T1IN  ── net label UART_TX
 U2 T1OUT ── net label RS232_TX
 U2 R1IN  ── net label RS232_RX
 U2 R1OUT ── net label UART_RX
-U2 T2IN  ── GND                         (unused channel — tie low)
-U2 R2IN  ── No-connect (X)
-U2 R2OUT ── No-connect (X)
-U2 T2OUT ── No-connect (X)
+U2 T2IN  ── J3 pin 1 (header pad)       (channel 2 breakout — see below)
+U2 T2OUT ── J3 pin 2 (header pad)
+U2 R2IN  ── J3 pin 3 (header pad)
+U2 R2OUT ── J3 pin 4 (header pad)
 ```
 
 ---
@@ -209,8 +210,7 @@ C13 one side ── VUSB, other ── GND     (100nF VCCIO bypass)
 **3V3OUT (internal LDO output):**
 ```
 U1 3V3OUT ── C12 one side
-C12 other side ── GND                   (100nF decoupling — do not load this net heavily)
-U1 3V3OUT ── also connects to R7 (section 10)
+C12 other side ── GND                   (100nF decoupling — FT232RL internal use only)
 ```
 
 **USB data pins (connect to D2 via net labels):**
@@ -323,7 +323,7 @@ J1 SBU1, SBU2 ── X (no-connect — sideband for alternate modes, not used)
 J2 pin 1 ── V12_OUT
 J2 pin 2 ── V12_OUT
 J2 pin 3 ── R7 one side
-R7 other side ── U1 3V3OUT              (10Ω current-limit to FT232RL LDO output)
+R7 other side ── net label V3V3          (10Ω current-limit from AMS1117-3.3 output)
 J2 pin 4 ── GND
 J2 pin 5 ── net label RS232_RX          (← from MAX3232 R1IN)
 J2 pin 6 ── net label RS232_TX          (→ to MAX3232 T1OUT)
@@ -335,7 +335,33 @@ J2 pin 10 ── GND                        (shield tab)
 
 ---
 
-## 11. Block 6 — LED Indicators
+## 11. Block 6 — AMS1117-3.3 LDO (3.3V for display power)
+
+**Place:** U4 (C6186), C15 (C45783), C16 (C45783)
+
+**Wire up:**
+```
+U4 Vin   ── net label VUSB
+U4 GND   ── GND
+U4 Vout  ── net label V3V3
+```
+
+**Input cap:**
+```
+C15 + side ── VUSB, C15 − side ── GND   (22µF/25V 0805)
+```
+
+**Output cap:**
+```
+C16 + side ── V3V3, C16 − side ── GND   (22µF/25V 0805)
+```
+
+> V3V3 net connects to R7 (section 10) → RJ45 pin 3.
+> During FLARM updates, FLARM also drives pin 3 at 3.3V; R7 (10Ω) limits any current mismatch.
+
+---
+
+## 12. Block 7 — LED Indicators
 
 **Place:** LED1 (C2297), LED2 (C2297), LED3 (C2296), R6 (C11702), R8 (C11702), R9 (C11702)
 
@@ -362,12 +388,46 @@ LED3 cathode ── net label RXLED         (connects to U1 CBUS1)
 
 ---
 
-## 12. Clean Up Schematic
+## 13. Block 8 — Breakout Headers (J3, J4)
+
+Two through-hole headers (2.54mm pitch PTH pads). Leave unpopulated on assembled boards — solder a pin header when needed.
+
+**J3 — MAX3232 Channel 2 Breakout (1×4 header)**
+
+Place a 1×4 PTH header near U2. No JLCPCB part needed (hand-solder).
+
+```
+J3 pin 1 ── U2 T2IN   (TTL input  — feed a TX signal here)
+J3 pin 2 ── U2 T2OUT  (RS232 output — level-shifted from T2IN)
+J3 pin 3 ── U2 R2IN   (RS232 input  — connect RS232 source here)
+J3 pin 4 ── U2 R2OUT  (TTL output — level-shifted from R2IN)
+```
+
+> **Example use:** Jumper J3 pin 1 to J4 pin 1 (UART_TX) → get a second RS232 TX
+> output on J3 pin 2. Acts as a serial tap/mirror of the main TX channel.
+
+**J4 — TTL UART Breakout (1×3 header)**
+
+Place a 1×3 PTH header near U1. Exposes the TTL-level UART signals for devices
+that speak TTL serial directly (bypassing RS232 level shifting).
+
+```
+J4 pin 1 ── net label UART_TX          (5V TTL TX from FT232RL)
+J4 pin 2 ── net label UART_RX          (5V TTL RX to FT232RL)
+J4 pin 3 ── GND                        (signal reference)
+```
+
+> These are the same nets that connect to U2 T1IN and U2 R1OUT. Adding J4 pads
+> does not change the existing circuit — it just exposes the signals.
+
+---
+
+## 14. Clean Up Schematic
 
 1. Add **component values** to all passives (double-click → edit Value field):
    - R1–R9: 100k, 5.1k, 10k, 5.1k, 5.1k, 1k, 10R, 1k, 1k
-   - C1–C14: 22µF/25V, 100n, 22µF/25V, 4.7µF, 100n, 100n, 100n, 100n, 100n, 4.7µF, 100n, 100n, 100n, 100n
-2. Verify all **designators** match R1–R9, C1–C14, LED1–3, U1–U3, L1, D1–D2, J1–J2
+   - C1–C16: 22µF/25V, 100n, 22µF/25V, 4.7µF, 100n, 100n, 100n, 100n, 100n, 4.7µF, 100n, 100n, 100n, 100n, 22µF/25V, 22µF/25V
+2. Verify all **designators** match R1–R9, C1–C16, LED1–3, U1–U4, L1, D1–D2, J1–J4
 3. Add a **design note text box** near the schematic:
    ```
    FLARM USB Updater v1.0
@@ -377,7 +437,7 @@ LED3 cathode ── net label RXLED         (connects to U1 CBUS1)
 
 ---
 
-## 13. ERC (Electrical Rules Check)
+## 15. ERC (Electrical Rules Check)
 
 1. **Design → Electrical Rules Check**
 2. Resolve all errors — common ones:
@@ -389,7 +449,7 @@ LED3 cathode ── net label RXLED         (connects to U1 CBUS1)
 
 ---
 
-## 14. Verification Checklist (before export)
+## 16. Verification Checklist (before export)
 
 - [ ] VBOOST connects only to: MT3608 output + C3 + C4 + D1 anode
 - [ ] V12_OUT connects only to: D1 cathode + J2 pin 1 + J2 pin 2
@@ -397,14 +457,17 @@ LED3 cathode ── net label RXLED         (connects to U1 CBUS1)
 - [ ] U1 CTS#, DSR#, DCD# → GND
 - [ ] U1 CBUS0 → TXLED net → LED2 cathode
 - [ ] U1 CBUS1 → RXLED net → LED3 cathode
-- [ ] J2 pin 3 → R7 → U1 3V3OUT
+- [ ] J2 pin 3 → R7 → V3V3 net → U4 Vout (AMS1117-3.3)
+- [ ] U4 Vin → VUSB, U4 GND → GND, C15 + C16 placed
 - [ ] J2 pins 9, 10 (shield) → GND
 - [ ] D2 placed in the D+/D− path between J1 and U1
 - [ ] R4, R5 (5.1kΩ) on CC1 and CC2 → GND
+- [ ] J3 (1×4): T2IN, T2OUT, R2IN, R2OUT connected to U2 channel 2 pins
+- [ ] J4 (1×3): UART_TX, UART_RX, GND connected
 
 ---
 
-## 15. Export
+## 17. Export
 
 **PDF (for review):**
 File → Export → Export PDF → save as `EasyEDA/schematic.pdf`
