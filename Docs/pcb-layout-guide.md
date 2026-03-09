@@ -200,25 +200,160 @@ Before resizing, verify the RJ45 footprint height:
 
 ---
 
-## 8. Routing Order
+## 8. Routing Order — Step-by-Step Guide
 
-Route in this order to avoid having to re-route:
+Route in this exact order — critical signals first, easy ones last. This ensures
+critical traces get the cleanest, most direct paths.
 
-1. **VUSB** — from J1 VBUS pins → C1 → C14 → U1 VCC → U2 VCC → U3 VIN (20mil)
-2. **GND** — short star connections from each IC GND pin to a central via (bottom pour handles the rest)
-3. **Boost switching loop** — SW → L1 → D1 → VBOOST (20mil)
-4. **V12_OUT** — D1 cathode → C3/C4 → R1 top → RJ1 pins 1&2 (15mil)
-5. **D+/D−** — J1 → D2 → U1 as differential pair (10mil matched)
-6. **UART_TX / UART_RX** — U1 → U2 (10mil)
-7. **RS232_TX / RS232_RX** — U2 → RJ1 pins 5&6 (10mil)
-8. **V3V3 / R7** — U4 Vout → R7 → RJ1 pin 3 (10mil)
-9. **LED nets** — TXLED / RXLED from U1 → LED cathodes (10mil)
-10. **Power LEDs** — VUSB → R6/R8/R9 → LED anodes (10mil)
-11. **Feedback divider** — VBOOST → R1 → R2 → GND, junction → U3 FB (10mil)
-12. **CC pull-downs** — J1 CC1/CC2 → R4/R5 → GND (10mil)
-13. **Add GND copper pour** (bottom layer)
-14. **Add via stitching** (GND net, every 6–8mm)
-15. **Run DRC** — fix all violations
+### Step 1: Ground Plane (Bottom Layer) — Do This FIRST
+
+Place a copper pour on the entire bottom layer (net = GND) before routing anything.
+This is the return path for every signal and power trace on the board.
+
+**Rule: Do NOT route any signals on the bottom layer — keep it solid ground.**
+
+### Step 2: Boost Converter Loop (HIGHEST PRIORITY)
+
+The switching node (SW) carries 1.2 MHz current pulses. A large loop radiates noise
+into USB and RS232. Route as a tight triangle, all on the top layer:
+
+```
+        L1
+     ┌──┤├──┐
+     │       │
+  U3 SW    D1 anode
+     │       │
+     │    D1 cathode ──→ C3/C4 (VBOOST output caps)
+     │       │
+     └── GND ┘  ← via to bottom GND plane RIGHT HERE
+```
+
+1. **U3 pin SW → L1 pad 1** — 20mil, under 5mm, no vias
+2. **L1 pad 2 → D1 anode** — 20mil, under 3mm, no vias
+3. **D1 cathode → C3 positive pad** — 20mil (VBOOST net), under 5mm
+4. **C1 (input cap) → U3 VIN** — place C1 as close as possible, under 3mm
+5. **C3 GND pad → GND via** — via RIGHT at the pad, not 5mm away
+6. **C1 GND pad → GND via** — same, via right at the pad
+
+**Via rule:** Place GND vias directly at each capacitor's ground pad. Use 0.3mm
+drill / 0.6mm pad. The boost section needs 3–4 dedicated GND vias: one at C1, one
+at C3, one at C4, one at U3 GND pad.
+
+### Step 3: USB D+/D− (Second Priority)
+
+Route from J2 (USB-C) → D2 (ESD) → U1 (FT232RL):
+
+1. **J2 D+ pad → D2 input** — 10mil, route as a pair, ~10mil spacing between them
+2. **D2 output → U1 USBDP/USBDM** — continue the pair, same width and spacing
+
+Length matching: keep both traces within 1mm of each other.
+
+**Via rule:** Ideally NO vias — route entirely on top layer. If you absolutely must
+cross something, use one via per line maximum, and use the same via on BOTH D+ and
+D− to keep them matched.
+
+### Step 4: UART Signals (FT232RL ↔ MAX3232)
+
+TTL-level signals between U1 and U2. These two chips are adjacent.
+
+1. **U1 TXD → U2 T1IN** — 10mil, top layer, direct
+2. **U1 RXD → U2 R1OUT** — 10mil, top layer, direct
+
+**Via rule:** No vias needed. Don't run these through the boost converter area.
+
+### Step 5: RS232 Signals (MAX3232 ↔ RJ45)
+
+±9V RS232 signals. Robust and noise-tolerant.
+
+1. **U2 T1OUT → RJ45 pin 6** (RS232_TX) — 10mil
+2. **U2 R1IN → RJ45 pin 5** (RS232_RX) — 10mil
+
+**Via rule:** If U2 and J1 are on opposite sides of the board, 1 via per signal is
+acceptable. RS232 tolerates ground plane breaks. Keep any bottom-layer trace SHORT
+— cross under the obstacle, then come back up immediately.
+
+### Step 6: Power Rails
+
+Route fat power traces in this order:
+
+**6a. VUSB (5V from USB-C) — 20mil:**
+1. J2 VBUS → C14 (input bypass near USB-C) — short
+2. C14 → U3 VIN (boost input)
+3. Branch: C14 → U1 VCC
+4. Branch: → U4 VIN (3.3V regulator)
+5. Branch: → U2 VCC
+6. Branch: → LED anodes (can narrow to 15mil here)
+
+**Via rule for VUSB:** Route on top layer if possible. If you must via to cross the
+board, use **TWO vias in parallel** — halves via resistance (15mΩ vs 30mΩ, matters
+at 900mA).
+
+**6b. V12_OUT (Boost output → RJ45) — 15mil:**
+1. D1 cathode → C3/C4 (already done in Step 2)
+2. C3/C4 → RJ45 pins 1 and 2
+
+**Via rule:** One via to cross under obstacles is fine. Use a larger via (0.4mm
+drill) for this power trace if your fab allows.
+
+**6c. V3V3 (3.3V regulator output) — 15mil:**
+1. U4 VOUT → C15/C16 (output caps, right at U4)
+2. C15/C16 → R7 (10Ω) → RJ45 pin 3
+
+### Step 7: LED Nets (Least Critical)
+
+1. **VUSB → R6 → LED1** (power indicator) — 10mil, any path
+2. **U1 CBUS0 → R8 → LED2** (TX) — 10mil
+3. **U1 CBUS1 → R9 → LED3** (RX) — 10mil
+4. **LED cathodes → GND via** — one via per LED, right at the cathode pad
+
+### Step 8: Remaining Connections + GND Stitching
+
+**Remaining signals:**
+1. R1/R2 feedback divider → U3 FB pin — keep short, under 3mm, in boost zone
+2. R3 pull-up → U3 EN pin — short trace, in boost zone
+3. R4, R5 (5.1kΩ) → USB-C CC1/CC2 — short traces near J2
+4. U1 TEST pin → GND — via right at the pad
+5. U1 CTS#, DSR#, DCD# → GND — vias at pads or short traces to nearby GND via
+
+**GND stitching vias (last step):**
+
+```
+ Via    Via         Via         Via    Via
+  ·      ·           ·           ·      ·
+
+  ·    [USB-C]  [FT232RL]  [MAX3232]  [RJ45]
+
+  ·      ·           ·           ·      ·
+ Via    Via         Via         Via    Via
+```
+
+- Every 6–8mm across the board
+- Extra vias around the boost converter (isolate its noise)
+- Extra vias between boost section and USB section (noise barrier)
+- Don't place stitching vias where they'd break traces on the bottom layer
+
+**Finally:**
+- **Run DRC** — fix all violations
+
+---
+
+## 8a. Via Usage Cheat Sheet
+
+| Use Case | Via Size | Quantity | Notes |
+|----------|----------|----------|-------|
+| GND at capacitor pads | 0.3mm drill | 1 per cap | Right at the pad, not far away |
+| GND stitching | 0.3mm drill | ~15–20 total | Every 6–8mm grid |
+| Power trace crossing | 0.3mm drill × 2 | 2 in parallel | Halves resistance for high current |
+| Signal crossing | 0.3mm drill | 1 per signal | Go down, cross, come back up immediately |
+| USB D+/D− | Avoid if possible | 0 ideally | If needed: 1 per line, matched |
+| LED cathodes to GND | 0.3mm drill | 1 per LED | At cathode pad |
+
+**Golden rules:**
+1. Bottom layer = GND only — no traces on bottom if you can help it
+2. Vias for power = use two in parallel — cheap insurance at high current
+3. Vias for signals = one, and keep the bottom trace SHORT — go down, cross under, come back up
+4. Boost converter area = keep everything tight, surround with GND vias
+5. Route critical signals FIRST so they get clean, direct paths — power can take detours
 
 ---
 
