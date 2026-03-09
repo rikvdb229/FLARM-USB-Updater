@@ -317,7 +317,7 @@
     <li><strong>U1 CTS# → GND</strong> <span class="tag red">CRITICAL</span> — prevents Windows COM port hang</li>
     <li><strong>U1 DSR# → GND</strong> <span class="tag yellow">IMPORTANT</span></li>
     <li><strong>U1 DCD# → GND</strong> <span class="tag yellow">IMPORTANT</span></li>
-    <li><strong>U1 RESET# → 3V3OUT via 10kΩ or NC</strong> <span class="tag green">OK</span> — internal POR works if NC</li>
+    <li><strong>U1 RESET# → NC</strong> <span class="tag green">OK</span> — has internal pull-up, internal POR sufficient</li>
     <li class="done">U2 T2IN (pin 10) → GND — confirmed in netlist</li>
     <li class="done">All charge pump caps C6–C9 connected correctly</li>
     <li class="done">CC1 (R4 5.1kΩ) and CC2 (R5 5.1kΩ) → GND on USB-C</li>
@@ -666,7 +666,7 @@
     <li><strong>D+/D− differential pair (10mil matched)</strong> — J1 → D2 → U1 USBDP/USBDM</li>
     <li><strong>UART_TX / UART_RX (10mil)</strong> — U1 pin 1 → U2 pin 11 (TX) · U2 pin 12 → U1 pin 5 (RX)</li>
     <li><strong>RS232_TX / RS232_RX (10mil)</strong> — U2 T1OUT → RJ1 pin 6 · RJ1 pin 5 → U2 R1IN</li>
-    <li><strong>3V3OUT / R7 (10mil)</strong> — U1 3V3OUT → C12 → R7 → RJ1 pin 3</li>
+    <li><strong>V3V3 / R7 (10mil)</strong> — U4 Vout → V3V3 → R7 → RJ1 pin 3</li>
     <li><strong>LED nets (10mil)</strong> — U1 CBUS0 → LED2 cathode · U1 CBUS1 → LED3 cathode · VUSB → R6/R8/R9 → LED anodes</li>
     <li><strong>Feedback + EN (10mil)</strong> — VBOOST → R1 → $1N2875 ← R2 ← GND · $1N2875 → U3 FB · $1N2847 → U3 EN ← R3 ← VUSB</li>
     <li><strong>CC pull-downs (10mil)</strong> — J1 CC1/CC2 → R4/R5 → GND</li>
