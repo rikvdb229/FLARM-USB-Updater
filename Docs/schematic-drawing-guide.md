@@ -184,10 +184,10 @@ U2 T1IN  ── net label UART_TX
 U2 T1OUT ── net label RS232_TX
 U2 R1IN  ── net label RS232_RX
 U2 R1OUT ── net label UART_RX
-U2 T2IN  ── J3 pin 1 (header pad)       (channel 2 breakout — see below)
-U2 T2OUT ── J3 pin 2 (header pad)
-U2 R2IN  ── J3 pin 3 (header pad)
-U2 R2OUT ── J3 pin 4 (header pad)
+U2 T2IN  ── X (no-connect)              (channel 2 unused — no MCU to drive it)
+U2 T2OUT ── X (no-connect)
+U2 R2IN  ── X (no-connect)
+U2 R2OUT ── X (no-connect)
 ```
 
 ---
@@ -388,36 +388,24 @@ LED3 cathode ── net label RXLED         (connects to U1 CBUS1)
 
 ---
 
-## 13. Block 8 — Breakout Headers (J3, J4)
+## 13. Block 8 — TTL UART Breakout Header (J3)
 
-Two through-hole headers (2.54mm pitch PTH pads). Leave unpopulated on assembled boards — solder a pin header when needed.
+One through-hole header (2.54mm pitch PTH pads). Leave unpopulated on assembled boards — solder a pin header when needed.
 
-**J3 — MAX3232 Channel 2 Breakout (1×4 header)**
+> **Why no MAX3232 channel 2 breakout?** The second RS232 channel has no microcontroller to drive it on this board. Without an external MCU, the header would serve no practical purpose. Dropped to reduce complexity.
 
-Place a 1×4 PTH header near U2. No JLCPCB part needed (hand-solder).
-
-```
-J3 pin 1 ── U2 T2IN   (TTL input  — feed a TX signal here)
-J3 pin 2 ── U2 T2OUT  (RS232 output — level-shifted from T2IN)
-J3 pin 3 ── U2 R2IN   (RS232 input  — connect RS232 source here)
-J3 pin 4 ── U2 R2OUT  (TTL output — level-shifted from R2IN)
-```
-
-> **Example use:** Jumper J3 pin 1 to J4 pin 1 (UART_TX) → get a second RS232 TX
-> output on J3 pin 2. Acts as a serial tap/mirror of the main TX channel.
-
-**J4 — TTL UART Breakout (1×3 header)**
+**J3 — TTL UART Breakout (1×3 header)**
 
 Place a 1×3 PTH header near U1. Exposes the TTL-level UART signals for devices
 that speak TTL serial directly (bypassing RS232 level shifting).
 
 ```
-J4 pin 1 ── net label UART_TX          (5V TTL TX from FT232RL)
-J4 pin 2 ── net label UART_RX          (5V TTL RX to FT232RL)
-J4 pin 3 ── GND                        (signal reference)
+J3 pin 1 ── net label UART_TX          (5V TTL TX from FT232RL)
+J3 pin 2 ── net label UART_RX          (5V TTL RX to FT232RL)
+J3 pin 3 ── GND                        (signal reference)
 ```
 
-> These are the same nets that connect to U2 T1IN and U2 R1OUT. Adding J4 pads
+> These are the same nets that connect to U2 T1IN and U2 R1OUT. Adding J3 pads
 > does not change the existing circuit — it just exposes the signals.
 
 ---
@@ -427,7 +415,7 @@ J4 pin 3 ── GND                        (signal reference)
 1. Add **component values** to all passives (double-click → edit Value field):
    - R1–R9: 100k, 5.1k, 10k, 5.1k, 5.1k, 1k, 10R, 1k, 1k
    - C1–C16: 22µF/25V, 100n, 22µF/25V, 4.7µF, 100n, 100n, 100n, 100n, 100n, 4.7µF, 100n, 100n, 100n, 100n, 22µF/25V, 22µF/25V
-2. Verify all **designators** match R1–R9, C1–C16, LED1–3, U1–U4, L1, D1–D2, J1–J4
+2. Verify all **designators** match R1–R9, C1–C16, LED1–3, U1–U4, L1, D1–D2, J1–J3
 3. Add a **design note text box** near the schematic:
    ```
    FLARM USB Updater v1.0
@@ -462,8 +450,8 @@ J4 pin 3 ── GND                        (signal reference)
 - [ ] J2 pins 9, 10 (shield) → GND
 - [ ] D2 placed in the D+/D− path between J1 and U1
 - [ ] R4, R5 (5.1kΩ) on CC1 and CC2 → GND
-- [ ] J3 (1×4): T2IN, T2OUT, R2IN, R2OUT connected to U2 channel 2 pins
-- [ ] J4 (1×3): UART_TX, UART_RX, GND connected
+- [ ] U2 channel 2 pins (T2IN, T2OUT, R2IN, R2OUT) all marked no-connect (X)
+- [ ] J3 (1×3): UART_TX, UART_RX, GND connected
 
 ---
 

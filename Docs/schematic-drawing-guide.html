@@ -526,8 +526,7 @@ C11 ── <span class="net">VUSB</span> ↔ GND                  <span class="c
 C13 ── <span class="net">VUSB</span> ↔ GND                  <span class="comment">(100nF VCCIO bypass)</span>
 
 <span class="comment">-- 3V3OUT (internal LDO) --</span>
-<span class="pin">U1 3V3OUT</span> ── C12 ── GND             <span class="comment">(100nF — do not load heavily)</span>
-<span class="pin">U1 3V3OUT</span> ── also to R7             <span class="comment">(section 10)</span>
+<span class="pin">U1 3V3OUT</span> ── C12 ── GND             <span class="comment">(100nF decoupling — internal use only, no net label)</span>
 
 <span class="comment">-- USB data pins (CRITICAL — connects to D2 in Block 4) --</span>
 <span class="pin">U1 USBDP</span> ── net label <span class="net">UD+</span>             <span class="comment">(→ D2 I/O1 → J1 D+)</span>
@@ -616,7 +615,7 @@ C14 ── <span class="net">VUSB</span> ↔ GND                 <span class="co
   <pre><span class="pin">J2 pin 1</span> ── <span class="net">V12_OUT</span>
 <span class="pin">J2 pin 2</span> ── <span class="net">V12_OUT</span>
 <span class="pin">J2 pin 3</span> ── R7 one side
-R7 other side ── <span class="pin">U1 3V3OUT</span>          <span class="comment">(10Ω current-limit)</span>
+R7 other side ── net label <span class="net">V3V3</span>      <span class="comment">(10Ω current-limit from AMS1117-3.3)</span>
 <span class="pin">J2 pin 4</span> ── GND
 <span class="pin">J2 pin 5</span> ── net label <span class="net">RS232_RX</span>    <span class="comment">(← from MAX3232 R1IN)</span>
 <span class="pin">J2 pin 6</span> ── net label <span class="net">RS232_TX</span>    <span class="comment">(→ to MAX3232 T1OUT)</span>
@@ -703,7 +702,7 @@ FT232RL uses usbser.sys (no driver install)</pre></li>
     <li>U1 CTS#, DSR#, DCD# → GND</li>
     <li>U1 CBUS0 → TXLED net → LED2 cathode</li>
     <li>U1 CBUS1 → RXLED net → LED3 cathode</li>
-    <li>J2 pin 3 → R7 → U1 3V3OUT</li>
+    <li>J2 pin 3 → R7 → V3V3 → U4 Vout (AMS1117-3.3)</li>
     <li>J2 pins 9, 10 (shield) → GND</li>
     <li>D2 placed in D+/D− path between J1 and U1</li>
     <li>R4, R5 (5.1kΩ) on CC1 and CC2 → GND</li>

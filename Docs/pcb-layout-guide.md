@@ -24,7 +24,7 @@ Open the schematic and verify these before touching the PCB:
 - [ ] **U1 CTS# → GND** *(prevents Windows COM port hang in some terminal apps)*
 - [ ] **U1 DSR# → GND**
 - [ ] **U1 DCD# → GND**
-- [ ] **U1 RESET# → 3V3OUT via 10kΩ** or leave NC (internal POR sufficient)
+- [ ] **U1 RESET#** → NC (internal pull-up, internal POR sufficient)
 - [ ] U2 T2IN → GND ✅ *(confirmed in netlist)*
 - [ ] All charge pump caps C6–C9 connected ✅
 - [ ] CC1 (R4) and CC2 (R5) on correct USB-C pins ✅
@@ -268,23 +268,19 @@ Add small test pads for first-board bring-up with a multimeter. Costs nothing in
 
 ---
 
-## 12. Breakout Headers (J3, J4)
+## 12. Breakout Header (J3)
 
-Two through-hole headers for optional hand-soldering. Leave unpopulated on assembled boards.
+One through-hole header for optional hand-soldering. Leave unpopulated on assembled boards.
 
-**J3 — MAX3232 Channel 2 (1×4, 2.54mm pitch)**
-- Place near U2 (MAX3232), along the bottom board edge
-- Pin labels in silkscreen: `T2I`, `T2O`, `R2I`, `R2O`
-- Pads: 1.0mm drill, 1.8mm pad, 2.54mm pitch
-
-**J4 — TTL UART (1×3, 2.54mm pitch)**
+**J3 — TTL UART (1×3, 2.54mm pitch)**
 - Place near U1 (FT232RL), along the bottom board edge
 - Pin labels in silkscreen: `TX`, `RX`, `GND`
 - Pads: 1.0mm drill, 1.8mm pad, 2.54mm pitch
 
-**In EasyEDA Pro:** Place → Pad → set drill 1.0mm, pad 1.8mm, shape Round. Place 4 pads at 2.54mm spacing for J3, 3 pads for J4. Assign nets manually. Add silkscreen text labels.
+**In EasyEDA Pro:** Place → Pad → set drill 1.0mm, pad 1.8mm, shape Round. Place 3 pads at 2.54mm spacing for J3. Assign nets manually. Add silkscreen text labels.
 
-> These headers are not in the JLCPCB BOM — they are hand-soldered when needed.
+> This header is not in the JLCPCB BOM — it is hand-soldered when needed.
+> MAX3232 channel 2 is unused (no MCU on board to drive it) — all channel 2 pins are no-connect.
 
 ---
 
@@ -319,6 +315,6 @@ Add these labels to the top silkscreen layer:
 - [ ] Mounting holes placed at opposite corners (M2.5, GND net)
 - [ ] Test points TP1–TP5 placed and labeled
 - [ ] Silkscreen: board name, connector labels, LED labels, voltage warnings
-- [ ] Breakout headers J3 (1×4) and J4 (1×3) placed along bottom edge with labels
+- [ ] Breakout header J3 (1×3 TTL UART) placed along bottom edge with labels
 - [ ] Gerber export: all layers including drill file
 - [ ] JLCPCB online Gerber viewer shows no missing copper or short circuits

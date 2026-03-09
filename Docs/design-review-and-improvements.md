@@ -11,9 +11,10 @@ Based on full analysis of `pcb_decoded.json` and `schematic_decoded.json`.
 USB-C ─── USBLC6 (ESD) ─── FT232RL (USB→UART) ─── MAX3232 (UART→RS232) ─── RJ45
   │         D2                    U1                     U2                    J1
   │
-  └── 5V ── MT3608 (Boost) ── B5819W (D1) ── ~12V ── RJ45 pins 1,2
-               U3                                        │
-                                                    FT232RL 3V3OUT ── R7 (10Ω) ── RJ45 pin 3
+  ├── 5V ── MT3608 (Boost) ── B5819W (D1) ── ~12V ── RJ45 pins 1,2
+  │            U3
+  └── 5V ── AMS1117-3.3 (LDO) ── V3V3 ── R7 (10Ω) ── RJ45 pin 3
+               U4
 ```
 
 **Purpose:** USB-C powered FLARM firmware updater. No external 12V supply needed.
@@ -38,7 +39,7 @@ These items were audited against the decoded JSON and are confirmed working:
 | 20 | VCC | VUSB | CORRECT |
 | 15 | USBDP | UD+ | CORRECT |
 | 16 | USBDM | UD- | CORRECT |
-| 17 | 3V3OUT | 3V3OUT | CORRECT |
+| 17 | 3V3OUT | C12 decoupling only | CORRECT — no net label, local connection to C12 |
 | 22 | CBUS1 | RXLED | CORRECT |
 | 23 | CBUS0 | TXLED | CORRECT |
 | 1 | TXD | UART_TX | CORRECT |
@@ -77,7 +78,7 @@ Confirmed: R1 = 100K (0402WGF**1003**TCE), R2 = 5.1K (0402WGF**5101**TCE). Outpu
 - VCC bypass (C5 = 100nF) present
 - Charge pump caps C6–C9 (all 100nF) correctly connected
 - Only channel 1 used (T1IN/T1OUT, R1IN/R1OUT)
-- Unused channel 2 inputs/outputs correctly marked NO_CONNECT
+- Channel 2 unused (no MCU on board to drive it) — all channel 2 pins marked NO_CONNECT
 - Pin 27, 31 (unused inputs) and pin 35 (unused output) flagged NC
 
 ### ESD Protection (D2, USBLC6-2SC6) — Correct
@@ -97,14 +98,14 @@ Current: (5V - 2V) / 1K = 3mA per LED. Well within FT232RL's 6mA sink limit.
 
 D1 (B5819W Schottky) in the boost converter output path inherently blocks reverse voltage from the RJ45 side. If external 12V is applied to RJ45 pins 1/2 while USB is disconnected, D1 is reverse-biased and blocks current from reaching the boost converter or USB input. **No additional reverse protection needed on V12_OUT.**
 
-### R7 (10 Ohm) on 3V3OUT to RJ45 Pin 3 — Correct
+### R7 (10 Ohm) on V3V3 to RJ45 Pin 3 — Correct
 
-R7 serves as a **balancing resistor** between the FT232RL's internal 3.3V LDO and the FLARM's own 3.3V rail. When both are powered:
+R7 serves as a **balancing resistor** between the AMS1117-3.3 LDO output and the FLARM's own 3.3V rail. When both are powered:
 - R7 prevents large current flow between the two 3.3V regulators
 - Limits inrush current into capacitive loads on the cable
 - Voltage drop at 25mA display load: 10Ω × 25mA = 0.25V (negligible)
 
-During FLARM firmware updates, FLARM drives pin 3 itself; R7 safely limits any mismatch current. During display firmware updates, FT232RL 3V3OUT (50mA max) powers the display through R7.
+During FLARM firmware updates, FLARM drives pin 3 itself; R7 safely limits any mismatch current. During display firmware updates, AMS1117-3.3 (800mA capable) powers the display through R7.
 
 ### PCB Design Rules — Correct
 
@@ -372,7 +373,7 @@ The bottom layer GND pour (POUR1) covers the full board with solid fill. After a
 |-----|---------|--------|-------|
 | 1 | V12_OUT | +12V | From boost, through D1 |
 | 2 | V12_OUT | +12V | Paralleled with pin 1 for current sharing |
-| 3 | $1N3570 | 3.3V | FT232RL 3V3OUT via R7 (10Ω balancing) |
+| 3 | $1N3570 | 3.3V | AMS1117-3.3 V3V3 via R7 (10Ω balancing) |
 | 4 | GND | Ground | |
 | 5 | RS232_RX | FLARM TX → this board RX | MAX3232 R1IN |
 | 6 | RS232_TX | This board TX → FLARM RX | MAX3232 T1OUT |
