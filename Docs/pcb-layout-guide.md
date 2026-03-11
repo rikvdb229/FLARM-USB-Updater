@@ -7,9 +7,9 @@
 
 | Parameter | Value |
 |-----------|-------|
-| Size | 2000 × 950 mils (50.8mm × 24.1mm) — target after reduction |
+| Size | 55mm × 28mm (2165 × 1102 mil) — target |
 | Current size | 2000 × 1200 mils (50.8mm × 30.5mm) |
-| Layers | 2 (Top signal + component, Bottom GND pour) |
+| Layers | 2 (Top signal + component, Bottom GND pour, Top GND fill) |
 | Copper weight | 1oz (35µm) |
 | Min trace/space | 6/6 mil (0.15mm/0.15mm) JLCPCB standard |
 | Surface finish | HASL or ENIG |
@@ -45,30 +45,41 @@ Always place in this order — connectors first, then ICs, then passives:
 8. **D2 (USBLC6-2SC6)** — between J1 and U1, on D+/D− path
 9. **All decoupling caps** — within 1–2mm of their respective IC power pins (before routing)
 10. **Boost passives** R1, R2, R3, C1–C4 — around U3/L1/D1 cluster
-11. **LEDs + current resistors** — top edge or bottom edge, grouped
+11. **U4 (AMS1117-3.3)** — near RJ45, short path to pin 3
+12. **LEDs + current resistors** — top-right edge, grouped
 
 ---
 
 ## 2. Board Layout Zone Map
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐ top edge
-│  LED1  LED2  LED3   R6  R8  R9   (LED strip — top edge)              │
-├──────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────────────────────────────────────────────────┐    │
-│  │  BOOST ZONE: U3  L1  D1  R1 R2 R3  C1 C2 C3 C4              │    │
-│  └──────────────────────────────────────────────────────────────┘    │
-│                                                                       │
-│  ┌────────┐  ┌──────────────────┐  ┌───────────────┐  ┌──────────┐  │
-│  │ USB-C  │  │   FT232RL (U1)   │  │  MAX3232 (U2) │  │   RJ45   │  │
-│  │  J1    │  │  C10 C11 C12 C13 │  │  C5–C9  R7    │  │   RJ1    │  │
-│  │  D2    │  │                  │  │               │  │          │  │
-│  │ R4 R5  │  │                  │  │               │  │          │  │
-│  │  C14   │  │                  │  │               │  │          │  │
-│  └────────┘  └──────────────────┘  └───────────────┘  └──────────┘  │
-└──────────────────────────────────────────────────────────────────────┘ bottom edge
- ←18mm→       ←──── 24mm ────→      ←── 18mm ──→      ←── 15mm ──→
+55mm
+┌────────────────────────────────────────────────────────────────┐
+│                    BOOST ZONE (top-left)              LEDs     │
+│  ┌─────────────────────────────────┐         LED1 LED2 LED3   │
+│  │ U3  L1  D1   R1 R2 R3          │         R6   R8   R9     │  28mm
+│  │ C1 C2   C3 C4                   │                          │
+│  └─────────────────────────────────┘                          │
+│                                                                │
+│ ┌──────┐  ┌────────────────┐  ┌──────────────┐  ┌──────────┐ │
+│ │USB-C │  │   FT232RL      │  │   MAX3232    │  │  RJ45    │ │
+│ │ J1   │  │   U1           │  │   U2         │  │  J2      │ │
+│ │      │  │ C10 C11 C12 C13│  │ C5 C6-C9     │  │          │ │
+│ │ D2   │  │                │  │              │  │  U4      │ │
+│ │R4 R5 │  │                │  │              │  │ C15 C16  │ │
+│ │ C14  │  │     J3 (bot)   │  │         R7   │  │          │ │
+│ └──────┘  └────────────────┘  └──────────────┘  └──────────┘ │
+│  MH1                    TP1-5                           MH2   │
+└────────────────────────────────────────────────────────────────┘
 ```
+
+### Placement principles
+- Connectors on opposite edges (USB-C left, RJ45 right)
+- Signal flow left-to-right: USB → FT232RL → MAX3232 → RJ45
+- Boost converter isolated in top-left zone (away from USB data lines)
+- LDO (U4) near RJ45 for short path to pin 3
+- LEDs along top-right edge for visibility
+- All components on TOP layer
 
 ---
 
@@ -161,10 +172,11 @@ The MT3608 switches at 1.2MHz. Poor layout creates radiated noise that can corru
 
 ---
 
-## 6. Ground Pour — Bottom Layer Only
+## 6. Ground Pour — Both Layers
 
 After routing all traces:
 
+### Bottom Layer GND Pour (primary ground return)
 1. Place → Copper Pour (or shortcut: Shift+P)
 2. Layer: **Bottom (B.Cu)**
 3. Net: **GND**
@@ -173,28 +185,45 @@ After routing all traces:
 6. Click to draw outline covering the full board outline
 7. Press Enter / double-click to close → EasyEDA fills automatically
 
-**Via stitching:**
+### Top Layer GND Pour (fills empty space)
+1. Place → Copper Pour
+2. Layer: **Top (F.Cu)**
+3. Net: **GND**
+4. Clearance: **10mil** (slightly larger to avoid solder bridging on 0402 pads)
+5. Fill mode: Solid
+6. Cover entire board outline
+7. Priority: lower than bottom pour
+
+> The top layer GND pour fills empty space around signal traces, improving EMI shielding
+> and thermal dissipation. The 10mil clearance prevents solder bridging risk on 0402 passives.
+
+### GND Routing Strategy
+- **Every GND pad gets a short stub (≤3mm) to a via → bottom pour handles the rest**
+- Do NOT route long GND traces on the top layer
+- Each decoupling cap GND pin gets its own dedicated GND via
+
+### Via stitching
 - After pour is placed: add vias on GND net every 6–8mm across the board
 - Especially important: around the boost converter, near USB connector, along board edges
-- Via size: 0.8mm drill, 1.2mm pad (JLCPCB minimum is 0.3mm drill)
+- Via size: 0.3mm drill, 0.6mm pad (JLCPCB standard)
 - EasyEDA: Place → Via → set net to GND → place around the board
-
-**Do NOT add top layer copper pour** — risk of tombstoning on 0402 passives during reflow.
 
 ---
 
-## 7. Board Outline Reduction
+## 7. Board Size
 
-### Current: 2000 × 1200 mils → Target: 2000 × 950 mils
+### Target: 55mm × 28mm (2165 × 1102 mil)
 
-Before resizing, verify the RJ45 footprint height:
-- Open RJ1 footprint → measure courtyard height
-- If courtyard ≤ 23mm: 950 mil board height works
-- If courtyard > 23mm: use 1050 mils (26.7mm) as safe minimum
+USB-C is ~9mm wide, RJ45 is ~16mm wide and ~13mm deep. FT232RL SSOP-28 is ~10mm body.
+With boost converter zone on top, 28mm height accommodates all zones. Width of 55mm gives
+room for signal chain USB-C → FT232RL → MAX3232 → RJ45 plus boost on top.
+
+If components don't fit at 28mm height, increase to 30mm. Board can be wider (up to 60mm)
+if needed for cleaner routing — prefer clean routing over smaller board.
 
 ### How to resize in EasyEDA Pro
 1. Click the board outline rectangle
-2. Properties → change Height from 1200 to 950 (or target value)
+2. Properties → change dimensions to 55mm × 28mm
 3. Verify all component courtyards are ≥ 0.5mm inside the new outline
 4. Drag any components that now violate the edge clearance inward
 
@@ -202,23 +231,66 @@ Before resizing, verify the RJ45 footprint height:
 
 ## 8. Routing Order
 
-Route in this order to avoid having to re-route:
+Route in this exact order. GND pads are NOT routed as traces — each gets a short stub to a via, then the copper pour handles the rest.
 
-1. **VUSB** — from J1 VBUS pins → C1 → C14 → U1 VCC → U2 VCC → U3 VIN (20mil)
-2. **GND** — short star connections from each IC GND pin to a central via (bottom pour handles the rest)
-3. **Boost switching loop** — SW → L1 → D1 → VBOOST (20mil)
-4. **V12_OUT** — D1 cathode → C3/C4 → R1 top → RJ1 pins 1&2 (15mil)
-5. **D+/D−** — J1 → D2 → U1 as differential pair (10mil matched)
-6. **UART_TX / UART_RX** — U1 → U2 (10mil)
-7. **RS232_TX / RS232_RX** — U2 → RJ1 pins 5&6 (10mil)
-8. **V3V3 / R7** — U4 Vout → R7 → RJ1 pin 3 (10mil)
-9. **LED nets** — TXLED / RXLED from U1 → LED cathodes (10mil)
-10. **Power LEDs** — VUSB → R6/R8/R9 → LED anodes (10mil)
-11. **Feedback divider** — VBOOST → R1 → R2 → GND, junction → U3 FB (10mil)
-12. **CC pull-downs** — J1 CC1/CC2 → R4/R5 → GND (10mil)
-13. **Add GND copper pour** (bottom layer)
-14. **Add via stitching** (GND net, every 6–8mm)
-15. **Run DRC** — fix all violations
+### Priority 1: Power Rails (20mil)
+1. **VUSB** — J1 VBUS → star topology to: C1/C2 (U3 VIN), C14 (D2), U1 VCC+C10/C11, U1 VCCIO+C13, U2 VCC+C5, U4 VIN+C15, R3 (EN), R6/R8/R9 (LEDs)
+
+### Priority 2: Boost Switching Loop (20mil, CRITICAL — minimize loop area)
+2. **SW ($1N2860)** — U3 SW (pin 1) → L1 (≤5mm, 20mil)
+3. **VBOOST** — L1 output → D1 anode (≤5mm, 20mil), also to C3/C4 and R1 top (FB divider)
+
+### Priority 3: 12V Output (15mil)
+4. **V12_OUT** — D1 cathode → C3/C4 positive → J2 pins 1,2 (route along top edge)
+
+### Priority 4: GND Connections (stub + via only)
+5. **GND** — Every GND pad gets a short stub (≤3mm) to a via to bottom pour:
+   - U3 GND (pin 2) — via directly at pad
+   - U1 GND pins (7, 18, 21) — short stubs to vias
+   - U2 GND (pin 15) — via at pad
+   - U4 GND tab — via at pad (SOT-223 tab is GND)
+   - J1 shield/GND — multiple vias near connector
+   - J2 GND pins (4, 7, 8) + shield — multiple vias
+   - R2 bottom, R4, R5 — via to GND
+   - All decoupling cap GND pins — each cap gets its own GND via
+   - LED cathodes (LED1 via R6) — via to GND
+
+### Priority 5: USB Differential Pair (10mil, matched)
+6. **UD+ / UD−** — J1 → D2 → U1, differential pair (6mil spacing)
+   - TOP layer only, no vias on D+/D−
+   - ≥3mm from boost SW node, ≥2mm from RS232 lines
+   - Match lengths within 20mil
+
+### Priority 6: UART Signals (10mil)
+7. **UART_TX** — U1 TXD (pin 1) → U2 T1IN (pin 11), branch to J3 pin 1
+8. **UART_RX** — U2 R1OUT (pin 12) → U1 RXD (pin 5), branch to J3 pin 2
+
+### Priority 7: RS232 Signals (10mil)
+9. **RS232_TX** — U2 T1OUT (pin 14) → J2 pin 6 (keep ≥2mm from USB)
+10. **RS232_RX** — J2 pin 5 → U2 R1IN (pin 13)
+
+### Priority 8: LDO Path (10mil)
+11. **V3V3** — U4 Vout → C16 → R7 → J2 pin 3
+
+### Priority 9: LED Drive Signals (10mil)
+12. **TXLED** — U1 CBUS0 (pin 23) → LED2 cathode
+13. **RXLED** — U1 CBUS1 (pin 22) → LED3 cathode
+14. **LED anodes** — R6→LED1, R8→LED2, R9→LED3
+
+### Priority 10: Remaining Passives (10mil)
+15. **FB divider** — R1-R2 junction → U3 FB (pin 3), keep short and away from SW
+16. **EN** — R3 → U3 EN (pin 4)
+17. **CC pull-downs** — J1 CC1/CC2 → R4/R5 → GND via
+18. **MAX3232 charge pump caps** — C6-C9 short stubs to respective U2 pins
+19. **FT232RL internal** — 3V3OUT (pin 17) → C12, TEST (pin 26) → GND via, CTS#/DSR#/DCD# → GND via
+
+### Final Steps
+20. **Add bottom GND copper pour** (8mil clearance)
+21. **Add top GND copper pour** (10mil clearance)
+22. **Add via stitching** (GND net, every 6–8mm, especially around boost zone and USB connector)
+23. **Run DRC** — fix all violations
+24. **Verify D+/D− length matching**
+25. **Verify boost loop is compact** (U3→L1→D1→C3 total ≤15mm)
 
 ---
 
@@ -308,9 +380,11 @@ Add these labels to the top silkscreen layer:
 - [ ] Boost switching loop (U3→L1→D1→C3) is tight and compact
 - [ ] No signal traces routed through boost converter zone
 - [ ] Bottom layer GND copper pour covers full board, clearance 8mil
+- [ ] Top layer GND copper pour fills empty space, clearance 10mil
+- [ ] All GND pads connect via short stub → via → bottom pour (no long GND traces)
 - [ ] GND vias stitched every 6–8mm
 - [ ] All component courtyard clearances ≥ 0.5mm from board edge
-- [ ] Board outline correct (2000 × 950 mils or confirmed size)
+- [ ] Board outline correct (55mm × 28mm or confirmed size)
 - [ ] Schematic: TEST, CTS#, DSR#, DCD# all tied to GND
 - [ ] Mounting holes placed at opposite corners (M2.5, GND net)
 - [ ] Test points TP1–TP5 placed and labeled

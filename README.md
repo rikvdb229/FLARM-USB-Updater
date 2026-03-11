@@ -70,7 +70,7 @@ See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-gu
 | C15 | 22µF / 25V 0805 — AMS1117 Vin | C45783 | Basic |
 | C16 | 22µF / 25V 0805 — AMS1117 Vout | C45783 | Basic |
 
-**35 components — 7 Extended parts ($21 in JLCPCB setup fees)**
+**37 components — 7 Extended parts ($21 in JLCPCB setup fees)**
 
 Unique passive C-numbers: only 6 distinct parts cover all 28 passives.
 
@@ -94,24 +94,11 @@ are swapped relative to FLARM updates. Use a crossover RJ45 cable (pins 5 and 6 
 labeled "DISPLAY". RS232 is non-damaging if crossed — receivers are high-impedance.
 No board changes needed.
 
-### Breakout Headers (unpopulated)
+### Breakout Header (unpopulated)
 
-Two through-hole headers for optional hand-soldering. Not assembled by JLCPCB — solder a pin header when needed.
+One through-hole header for optional hand-soldering. Not assembled by JLCPCB — solder a pin header when needed.
 
-**J3 — MAX3232 Channel 2 (1×4, 2.54mm)**
-
-Exposes the unused second RS232 channel. All four pins brought out:
-
-| Pin | Signal | Type |
-|-----|--------|------|
-| 1 | T2IN | TTL input → RS232 output on pin 2 |
-| 2 | T2OUT | RS232 output |
-| 3 | R2IN | RS232 input → TTL output on pin 4 |
-| 4 | R2OUT | TTL output |
-
-Example: jumper J3 pin 1 to J4 pin 1 (UART_TX) → J3 pin 2 becomes a second RS232 TX output (serial tap).
-
-**J4 — TTL UART (1×3, 2.54mm)**
+**J3 — TTL UART (1×3, 2.54mm)**
 
 Exposes the TTL-level UART signals (between FT232RL and MAX3232). Useful for connecting devices that speak TTL serial directly, bypassing RS232.
 
