@@ -49,10 +49,10 @@ See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-gu
 | R3 | 10kΩ 0402 — MT3608 EN pull-up | C25744 | Basic |
 | R4 | 5.1kΩ 0402 — USB-C CC1 | C25905 | Basic |
 | R5 | 5.1kΩ 0402 — USB-C CC2 | C25905 | Basic |
-| R6 | 1kΩ 0402 — power LED current | C11702 | Basic |
-| R7 | 10Ω 0402 — RJ45 pin 3 current limit | C25077 | Basic |
-| R8 | 1kΩ 0402 — TX LED current | C11702 | Basic |
-| R9 | 1kΩ 0402 — RX LED current | C11702 | Basic |
+| R6 | 10Ω 0402 — RJ45 pin 3 current limit | C25077 | Basic |
+| R7 | 470Ω 0603 — power LED current | C23179 | Basic |
+| R8 | 470Ω 0603 — TX LED current | C23179 | Basic |
+| R9 | 470Ω 0603 — RX LED current | C23179 | Basic |
 | C1 | 22µF / 25V 0805 — MT3608 Vin | C45783 | Basic |
 | C2 | 100nF 0402 — MT3608 Vin | C307331 | Basic |
 | C3 | 22µF / 25V 0805 — MT3608 Vout | C45783 | Basic |
@@ -72,7 +72,7 @@ See [Docs/pcb-layout-guide.md](Docs/pcb-layout-guide.md) and [Docs/pcb-layout-gu
 
 **37 components — 7 Extended parts ($21 in JLCPCB setup fees)**
 
-Unique passive C-numbers: only 6 distinct parts cover all 28 passives.
+Unique passive C-numbers: only 8 distinct parts cover all 25 passives.
 
 ### FLARM RJ45 Pinout (8P8C shielded)
 
@@ -117,7 +117,7 @@ Exposes the TTL-level UART signals (between FT232RL and MAX3232). Useful for con
 | LED3 | Yellow (C2296) | FT232RL RXLED# (CBUS1) | Flashes during data reception |
 
 TXLED# and RXLED# are active-low, default CBUS0/CBUS1 factory config — no EEPROM needed.
-Wiring: VUSB → 1kΩ → LED anode → cathode → TXLED#/RXLED# pin.
+Wiring: VUSB → LED anode → cathode → 470Ω → TXLED#/RXLED# pin.
 
 ## What Else Can It Do?
 
