@@ -12,3 +12,17 @@ desktop.ini
 
 # macOS
 .DS_Store
+
+# Node.js (docx generator)
+node_modules/
+package.json
+package-lock.json
+
+# EasyEDA backups/copies
+*kopie*
+*.backup-*
+
+# Temp analysis files
+EDA/extracted/
+EDA/*_backup/
+EDA/*.json

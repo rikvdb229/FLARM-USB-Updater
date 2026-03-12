@@ -1,0 +1,219 @@
+const fs = require('fs');
+const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+        Header, Footer, AlignmentType, LevelFormat, HeadingLevel,
+        BorderStyle, WidthType, ShadingType, VerticalAlign, PageNumber, PageBreak } = require('docx');
+
+const tb = { style: BorderStyle.SINGLE, size: 1, color: "CCCCCC" };
+const cb = { top: tb, bottom: tb, left: tb, right: tb };
+const hdrShade = { fill: "1B3A5C", type: ShadingType.CLEAR };
+const altShade = { fill: "F2F6FA", type: ShadingType.CLEAR };
+const noShade = { fill: "FFFFFF", type: ShadingType.CLEAR };
+
+function hdrCell(text, width) {
+  return new TableCell({ borders: cb, width: { size: width, type: WidthType.DXA }, shading: hdrShade, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text, bold: true, size: 18, color: "FFFFFF", font: "Arial" })] })] });
+}
+function cell(text, width, shade) {
+  return new TableCell({ borders: cb, width: { size: width, type: WidthType.DXA }, shading: shade || noShade, verticalAlign: VerticalAlign.CENTER,
+    children: [new Paragraph({ spacing: { before: 40, after: 40 }, children: [new TextRun({ text, size: 18, font: "Arial" })] })] });
+}
+
+const bom = [
+  ["U1", "FT232RL-REEL", "USB to UART converter", "SSOP-28", "C8690", "Extended"],
+  ["U2", "MAX3232CSE+T", "RS232 transceiver (dual)", "SOIC-16", "C7258", "Extended"],
+  ["U3", "MT3608", "Step-up DC-DC converter", "SOT-23-6", "C84817", "Extended"],
+  ["U4", "AMS1117-3.3", "3.3V LDO regulator", "SOT-223", "C6186", "Basic"],
+  ["D1", "B5819W SL", "Schottky diode (boost)", "SOD-123", "C8598", "Basic"],
+  ["D2", "USBLC6-2SC6", "USB ESD protection", "SOT-23-6", "C7519", "Extended"],
+  ["L1", "SMNR4020-22UH", "22\u00B5H inductor (boost)", "4x4mm SMD", "C135264", "Extended"],
+  ["J1", "TYPE-C-31-M-12", "USB-C receptacle", "SMD 12-pin", "C165948", "Extended"],
+  ["RJ1", "RJ-064-1", "RJ45 jack (SMD)", "SMD", "TBD", "Extended"],
+  ["J3", "HDR-M 1x3P", "TTL UART breakout (unpop.)", "2.54mm PTH", "N/A", "N/A"],
+  ["LED1", "KT-0805G", "Power LED (green)", "0805", "C2297", "Basic"],
+  ["LED2", "KT-0805Y", "TX LED (yellow)", "0805", "C2296", "Basic"],
+  ["LED3", "KT-0805Y", "RX LED (yellow)", "0805", "C2296", "Basic"],
+  ["R1", "0402WGF1003TCE", "100k\u03A9 \u00B11% (boost FB top)", "0402", "C25741", "Basic"],
+  ["R2", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (boost FB bottom)", "0402", "C25905", "Basic"],
+  ["R3", "0402WGF1002TCE", "10k\u03A9 \u00B11% (boost EN pull-up)", "0402", "C25744", "Basic"],
+  ["R4", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (USB CC1)", "0402", "C25905", "Basic"],
+  ["R5", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (USB CC2)", "0402", "C25905", "Basic"],
+  ["R6", "0402WGF100JTCE", "10\u03A9 \u00B11% (LDO to RJ45)", "0402", "C25077", "Basic"],
+  ["R7", "0402WGF6800TCE", "680\u03A9 \u00B11% (power LED)", "0402", "C25130", "Basic"],
+  ["R8", "0402WGF6800TCE", "680\u03A9 \u00B11% (TX LED)", "0402", "C25130", "Basic"],
+  ["R9", "0402WGF6800TCE", "680\u03A9 \u00B11% (RX LED)", "0402", "C25130", "Basic"],
+  ["C1", "CL21A226MAQNNNE", "22\u00B5F 25V (boost input)", "0805", "C45783", "Basic"],
+  ["C2", "CL05B104KO5NNNC", "100nF (boost input HF)", "0402", "C307331", "Basic"],
+  ["C3", "CL21A226MAQNNNE", "22\u00B5F 25V (boost output)", "0805", "C45783", "Basic"],
+  ["C4", "CL21A475KAQNNNE", "4.7\u00B5F (boost output HF)", "0805", "C1779", "Basic"],
+  ["C5-C9", "CL05B104KO5NNNC", "100nF (MAX3232 charge pump)", "0402", "C307331", "Basic"],
+  ["C10", "CL21A475KAQNNNE", "4.7\u00B5F (FT232RL VCC)", "0805", "C1779", "Basic"],
+  ["C11-C14", "CL05B104KO5NNNC", "100nF (FT232RL decoupling)", "0402", "C307331", "Basic"],
+  ["C15", "CL21A226MAQNNNE", "22\u00B5F 25V (LDO input)", "0805", "C45783", "Basic"],
+  ["C16", "CL21A226MAQNNNE", "22\u00B5F 25V (LDO output)", "0805", "C45783", "Basic"],
+];
+
+const rj45pins = [
+  ["1", "+12V (V12_OUT)", "Linked with pin 2"],
+  ["2", "+12V (V12_OUT)", "Linked with pin 1"],
+  ["3", "+3.3V (V3V3_OUT via R6)", "FLARM supplies 3V during updates"],
+  ["4", "GND", "Linked with pins 7, 8"],
+  ["5", "FLARM TX (RS232_RX)", "PC-side: SUB-D9 pin 2"],
+  ["6", "FLARM RX (RS232_TX)", "PC-side: SUB-D9 pin 3"],
+  ["7", "GND", "Linked with pins 4, 8"],
+  ["8", "GND", "PC-side: SUB-D9 pin 5"],
+];
+
+const nets = [
+  ["VUSB", "USB 5V supply from USB-C"],
+  ["GND", "Ground"],
+  ["VBOOST", "Boost converter output (~12.36V)"],
+  ["V12_OUT", "12V after Schottky diode (~12.0V)"],
+  ["V3V3", "3.3V LDO output"],
+  ["V3V3_OUT", "3.3V to FLARM via R6 (10\u03A9)"],
+  ["UD+", "USB data positive"],
+  ["UD-", "USB data negative"],
+  ["CC1", "USB-C configuration channel 1"],
+  ["CC2", "USB-C configuration channel 2"],
+  ["UART_TX", "TTL-level TX (FT232RL to MAX3232)"],
+  ["UART_RX", "TTL-level RX (MAX3232 to FT232RL)"],
+  ["RS232_TX", "RS232-level TX (to FLARM RX)"],
+  ["RS232_RX", "RS232-level RX (from FLARM TX)"],
+  ["TXLED", "FT232RL CBUS0 (active-low TX indicator)"],
+  ["RXLED", "FT232RL CBUS1 (active-low RX indicator)"],
+  ["SW", "Boost converter switch node (L1 to U3)"],
+  ["FB", "Boost feedback divider midpoint"],
+  ["EN", "Boost converter enable (pulled high via R3)"],
+  ["FT_3V3", "FT232RL internal 3.3V output (C12 decoupling)"],
+];
+
+function makeTable(headers, rows, colWidths) {
+  const hdrRow = new TableRow({ tableHeader: true, children: headers.map((h, i) => hdrCell(h, colWidths[i])) });
+  const dataRows = rows.map((row, ri) => new TableRow({
+    children: row.map((c, ci) => cell(c, colWidths[ci], ri % 2 === 0 ? altShade : noShade))
+  }));
+  return new Table({ columnWidths: colWidths, rows: [hdrRow, ...dataRows] });
+}
+
+const doc = new Document({
+  styles: {
+    default: { document: { run: { font: "Arial", size: 22 } } },
+    paragraphStyles: [
+      { id: "Title", name: "Title", basedOn: "Normal", run: { size: 48, bold: true, color: "1B3A5C", font: "Arial" }, paragraph: { spacing: { before: 0, after: 200 }, alignment: AlignmentType.CENTER } },
+      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 32, bold: true, color: "1B3A5C", font: "Arial" }, paragraph: { spacing: { before: 360, after: 200 }, outlineLevel: 0 } },
+      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 26, bold: true, color: "2E5E8E", font: "Arial" }, paragraph: { spacing: { before: 240, after: 120 }, outlineLevel: 1 } },
+      { id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 22, bold: true, color: "3A7ABF", font: "Arial" }, paragraph: { spacing: { before: 200, after: 100 }, outlineLevel: 2 } },
+    ]
+  },
+  numbering: {
+    config: [
+      { reference: "bullet-list", levels: [{ level: 0, format: LevelFormat.BULLET, text: "\u2022", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+      { reference: "num-features", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+      { reference: "num-usecases", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+      { reference: "num-todo", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 720, hanging: 360 } } } }] },
+    ]
+  },
+  sections: [{
+    properties: {
+      page: { margin: { top: 1200, right: 1200, bottom: 1200, left: 1200 } }
+    },
+    headers: {
+      default: new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: "FLARM USB Updater \u2014 Design Document", size: 16, color: "999999", font: "Arial", italics: true })] })] })
+    },
+    footers: {
+      default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "Page ", size: 16, color: "999999" }), new TextRun({ children: [PageNumber.CURRENT], size: 16, color: "999999" }), new TextRun({ text: " of ", size: 16, color: "999999" }), new TextRun({ children: [PageNumber.TOTAL_PAGES], size: 16, color: "999999" })] })] })
+    },
+    children: [
+      // Title
+      new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("FLARM USB Updater")] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "Hardware Design Document", size: 28, color: "2E5E8E", font: "Arial" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: "Rev 1.0 \u2014 March 2026", size: 20, color: "666666" })] }),
+
+      // 1. Overview
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("1. Overview")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("The FLARM USB Updater is a USB-to-RS232 adapter with an integrated 12V boost converter, designed to update FLARM firmware and FLARM displays without requiring external power. It connects to a PC via USB-C and to the FLARM unit via an RJ45 cable following the IGC specification.")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("1.1 Key Features")] }),
+      ...[
+        "USB-C powered \u2014 no external 12V supply needed",
+        "FT232RL USB-UART bridge (uses built-in Windows usbser.sys driver)",
+        "MAX3232 RS232 level converter for FLARM communication",
+        "MT3608 boost converter: 5V USB \u2192 12V FLARM power",
+        "AMS1117-3.3 LDO for FLARM 3.3V pin",
+        "USBLC6-2SC6 ESD protection on USB data lines",
+        "3 status LEDs: power (green), TX (yellow), RX (yellow)",
+        "TTL UART breakout header (J3) for direct TTL access",
+        "All SMT, JLCPCB assembly compatible",
+      ].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("1.2 Use Cases")] }),
+      ...["FLARM firmware updates (straight RJ45 cable)", "FLARM display updates (crossover RJ45 cable, pins 5+6 swapped)", "IGC flight log download", "FLARM configuration and live NMEA diagnostics", "General-purpose USB to RS232 adapter (cable with GND/TX/RX only)"].map(t => new Paragraph({ numbering: { reference: "num-usecases", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      // 2. Block Diagram
+      new Paragraph({ children: [new PageBreak()] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("2. System Architecture")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("The design consists of five functional blocks:")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.1 Power Supply")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "Boost Converter (MT3608): ", bold: true }), new TextRun("Converts 5V USB to ~12.36V. Feedback divider R1 (100k\u03A9) / R2 (5.1k\u03A9) sets Vout = 0.6 \u00D7 (1 + R1/R2) = 12.36V. Schottky diode D1 (B5819W) drops ~0.36V, yielding ~12.0V at V12_OUT. L1 is a 22\u00B5H inductor (top of MT3608 recommended range) chosen for lower peak current and ripple at our light load (~85mA).")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "LDO (AMS1117-3.3): ", bold: true }), new TextRun("Provides 3.3V from USB 5V for FLARM pin 3. R6 (10\u03A9) limits current between the LDO output and FLARM's internal 3.3V regulator to prevent backfeed.")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "Power Budget: ", bold: true }), new TextRun("Classic FLARM draws ~85mA at 12V. Total USB current: ~280mA, well within any USB port's capability.")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.2 USB Interface")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("USB-C connector (J1) with CC1/CC2 pull-down resistors (R4, R5: 5.1k\u03A9) for UFP sink identification. USBLC6-2SC6 (D2) provides ESD protection on D+/D- lines. Both USB-C orientations are supported.")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.3 USB-UART Bridge")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL (U1) converts USB to TTL UART. Chosen over CH340C because the November 2024 Windows Update broke CH340 drivers; FT232RL uses the built-in usbser.sys driver. CBUS0 (TXLED#) and CBUS1 (RXLED#) drive status LEDs via active-low outputs. Pin 26 (TEST) tied to GND. Unused modem control inputs (RI#, DSR#, DCD#, CTS#) tied to GND.")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.4 RS232 Level Converter")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("MAX3232 (U2) converts TTL UART to RS232 levels using charge pump capacitors C5-C9 (all 100nF). Channel 1 is used for FLARM communication. Channel 2 is unused; T2IN (pin 10) must be tied to GND to prevent floating input oscillation.")] }),
+
+      new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.5 LED Indicators")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("All LEDs use the same topology: VUSB \u2192 LED anode (pin 1) \u2192 LED cathode (pin 2) \u2192 R \u2192 sink.")] }),
+      ...["LED1 (green, KT-0805G): Power indicator. R7 (680\u03A9) to GND. Always on. I = (5-2.8)/680 = 3.2mA.", "LED2 (yellow, KT-0805Y): TX activity. R8 (680\u03A9) to TXLED (CBUS0). I = (5-2.1)/680 = 4.3mA when active.", "LED3 (yellow, KT-0805Y): RX activity. R9 (680\u03A9) to RXLED (CBUS1). I = (5-2.1)/680 = 4.3mA when active."].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      // 3. RJ45 Pinout
+      new Paragraph({ children: [new PageBreak()] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("3. RJ45 Pinout (IGC Specification)")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Pin numbering follows the IGC GNSS FR specification. The SMD RJ45 connector (RJ-064-1) has reversed pad numbering (pad 1 = RJ45 pin 8), accounted for in the PCB routing.")] }),
+      makeTable(["Pin", "Signal", "Notes"], rj45pins, [1200, 3600, 4560]),
+
+      // 4. Net Names
+      new Paragraph({ heading: HeadingLevel.HEADING_1, spacing: { before: 400 }, children: [new TextRun("4. Net Names")] }),
+      makeTable(["Net Name", "Description"], nets, [2400, 6960]),
+
+      // 5. BOM
+      new Paragraph({ children: [new PageBreak()] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("5. Bill of Materials")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("38 SMT components. 7 Extended parts (\u00D7 $3 = $21 setup fee). J3 is unpopulated (hand-solder when needed).")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "Estimated cost: 5 boards \u2248 $16.70/ea, 10 boards \u2248 $12.30/ea", bold: true, size: 20 })] }),
+      makeTable(["Ref", "Part", "Description", "Package", "LCSC", "Class"], bom, [900, 2400, 2800, 1200, 1100, 960]),
+
+      // 6. PCB
+      new Paragraph({ children: [new PageBreak()] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("6. PCB Design")] }),
+      ...["2-layer board with GND copper pour on both layers", "Via stitching between top and bottom ground planes", "Power traces (VUSB, VBOOST, V12_OUT, GND): 20mil minimum", "Signal traces (UART, RS232, USB, LED): 10mil", "USB differential pair (UD+/UD-): matched length", "M2.5 mounting holes at opposite corners (GND net)", "Test points: VUSB, VBOOST, V12_OUT, V3V3, GND", "Designed in EasyEDA Pro, manufactured by JLCPCB"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      // 7. Design Decisions
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("7. Key Design Decisions")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("FT232RL over CH340C")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("November 2024 Windows Update broke CH340 drivers. FT232RL uses the built-in usbser.sys driver, eliminating driver issues.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("USBLC6-2SC6 ESD Protection")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Aviation and workshop environments have significant ESD risk. The USBLC6-2SC6 protects USB data lines with minimal capacitance impact.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("22\u00B5H Inductor")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Top of the MT3608 recommended range (4.7-22\u00B5H). Chosen for lower peak inductor current and reduced output ripple at our light load (~85mA at 12V). The SMNR4020-22UH (4x4mm) fits the board.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("R6 Current Limiter (10\u03A9)")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Limits current between AMS1117-3.3 output and FLARM's internal 3.3V regulator on pin 3. During firmware updates, FLARM drives pin 3 at ~3.3V; R6 prevents significant backfeed current between the two regulators.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("680\u03A9 LED Resistors")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("KT-0805G (green) has a maximum forward current of 5mA. With 680\u03A9: I = (5-2.8)/680 = 3.2mA, providing comfortable margin. Yellow LEDs run at 4.3mA. Both values produce adequate brightness (430mcd green, 175mcd yellow).")] }),
+
+      // 8. Open Items
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Remaining Items")] }),
+      ...["Tie MAX3232 pin 10 (T2IN) to GND in schematic", "Verify R7/R8/R9 are updated to 680\u03A9 (0402WGF6800TCE)", "Run ERC and DRC in EasyEDA Pro", "Verify SMD RJ45 (RJ-064-1) footprint and C-number", "Export Gerber, BOM, CPL for JLCPCB order", "Optional: Program FT232RL EEPROM via FT_PROG (device description, serial number)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
+    ]
+  }]
+});
+
+Packer.toBuffer(doc).then(buffer => {
+  fs.writeFileSync("d:\\CodeProjects\\FLARM-USB-Updater\\Docs\\FLARM_USB_Updater_Design_Document.docx", buffer);
+  console.log("Design document created successfully.");
+});
