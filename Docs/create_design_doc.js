@@ -30,7 +30,7 @@ const bom = [
   ["RJ1", "RJ-064-1", "RJ45 jack (SMD)", "SMD", "TBD", "Extended"],
   ["J3", "HDR-M 1x3P", "TTL UART breakout (unpop.)", "2.54mm PTH", "N/A", "N/A"],
   ["LED1", "KT-0805G", "Power LED (green)", "0805", "C2297", "Basic"],
-  ["LED2", "KT-0805Y", "TX LED (yellow)", "0805", "C2296", "Basic"],
+  ["LED2", "KT-0805G", "TX LED (green)", "0805", "C2297", "Basic"],
   ["LED3", "KT-0805Y", "RX LED (yellow)", "0805", "C2296", "Basic"],
   ["R1", "0402WGF1003TCE", "100k\u03A9 \u00B11% (boost FB top)", "0402", "C25741", "Basic"],
   ["R2", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (boost FB bottom)", "0402", "C25905", "Basic"],
@@ -126,7 +126,9 @@ const doc = new Document({
       // Title
       new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("FLARM USB Updater")] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "Hardware Design Document", size: 28, color: "2E5E8E", font: "Arial" })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: "Rev 1.0 \u2014 March 2026", size: 20, color: "666666" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "REV A", size: 24, bold: true, color: "1B3A5C", font: "Arial" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "PCB: 53.4 \u00D7 30.5 mm (2102 \u00D7 1200 mil), 2-layer FR4", size: 20, color: "666666" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: "March 2026", size: 20, color: "666666" })] }),
 
       // 1. Overview
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("1. Overview")] }),
@@ -140,7 +142,7 @@ const doc = new Document({
         "MT3608 boost converter: 5V USB \u2192 12V FLARM power",
         "AMS1117-3.3 LDO for FLARM 3.3V pin",
         "USBLC6-2SC6 ESD protection on USB data lines",
-        "3 status LEDs: power (green), TX (yellow), RX (yellow)",
+        "3 status LEDs: power (green), TX (green), RX (yellow)",
         "TTL UART breakout header (J3) for direct TTL access",
         "All SMT, JLCPCB assembly compatible",
       ].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
@@ -169,7 +171,7 @@ const doc = new Document({
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.5 LED Indicators")] }),
       new Paragraph({ spacing: { after: 100 }, children: [new TextRun("All LEDs use the same topology: VUSB \u2192 LED anode (pin 1) \u2192 LED cathode (pin 2) \u2192 R \u2192 sink.")] }),
-      ...["LED1 (green, KT-0805G): Power indicator. R7 (680\u03A9) to GND. Always on. I = (5-2.8)/680 = 3.2mA.", "LED2 (yellow, KT-0805Y): TX activity. R8 (680\u03A9) to TXLED (CBUS0). I = (5-2.1)/680 = 4.3mA when active.", "LED3 (yellow, KT-0805Y): RX activity. R9 (680\u03A9) to RXLED (CBUS1). I = (5-2.1)/680 = 4.3mA when active."].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      ...["LED1 (green, KT-0805G): Power indicator. R7 (680\u03A9) to GND. Always on. I = (5-2.8)/680 = 3.2mA.", "LED2 (green, KT-0805G): TX activity. R8 (680\u03A9) to TXLED (CBUS0). I = (5-2.8)/680 = 3.2mA when active.", "LED3 (yellow, KT-0805Y): RX activity. R9 (680\u03A9) to RXLED (CBUS1). I = (5-2.1)/680 = 4.3mA when active."].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
 
       // 3. RJ45 Pinout
       new Paragraph({ children: [new PageBreak()] }),
@@ -191,7 +193,8 @@ const doc = new Document({
       // 6. PCB
       new Paragraph({ children: [new PageBreak()] }),
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("6. PCB Design")] }),
-      ...["2-layer board with GND copper pour on both layers", "Via stitching between top and bottom ground planes", "Power traces (VUSB, VBOOST, V12_OUT, GND): 20mil minimum", "Signal traces (UART, RS232, USB, LED): 10mil", "USB differential pair (UD+/UD-): matched length", "M2.5 mounting holes at opposite corners (GND net)", "Test points: VUSB, VBOOST, V12_OUT, V3V3, GND", "Designed in EasyEDA Pro, manufactured by JLCPCB"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "Board: 53.4 \u00D7 30.5 mm (2102 \u00D7 1200 mil), 2-layer FR4, 1oz copper.", bold: true })] }),
+      ...["GND copper pour on both layers (164 poured regions)", "51 vias (49 GND, 2 VUSB) for ground plane stitching", "Power traces (VUSB, VBOOST, SW, V3V3): 20mil", "V12_OUT traces: 15mil", "Signal traces (UART, RS232, USB, LED): 10mil", "USB differential pair (UD+/UD-): length matched at 24.3mm", "312 trace segments across 29 routed nets", "Designed in EasyEDA Pro, manufactured by JLCPCB"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
 
       // 7. Design Decisions
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("7. Key Design Decisions")] }),
@@ -202,13 +205,18 @@ const doc = new Document({
       new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("22\u00B5H Inductor")] }),
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Top of the MT3608 recommended range (4.7-22\u00B5H). Chosen for lower peak inductor current and reduced output ripple at our light load (~85mA at 12V). The SMNR4020-22UH (4x4mm) fits the board.")] }),
       new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("R6 Current Limiter (10\u03A9)")] }),
-      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("Limits current between AMS1117-3.3 output and FLARM's internal 3.3V regulator on pin 3. During firmware updates, FLARM drives pin 3 at ~3.3V; R6 prevents significant backfeed current between the two regulators.")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FLARM outputs up to 200mA at 3.3V on pin 3 (per FLARM manual). Without R6, two LDO outputs would fight, causing uncontrolled current flow. R6 limits mismatch current to ~10mA max. AMS1117 handles backfeed safely with 22\u00B5F caps (no protection diode needed). Can be replaced with 0\u03A9 if display voltage drop is an issue.")] }),
       new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("680\u03A9 LED Resistors")] }),
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("KT-0805G (green) has a maximum forward current of 5mA. With 680\u03A9: I = (5-2.8)/680 = 3.2mA, providing comfortable margin. Yellow LEDs run at 4.3mA. Both values produce adequate brightness (430mcd green, 175mcd yellow).")] }),
 
-      // 8. Open Items
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Remaining Items")] }),
-      ...["Tie MAX3232 pin 10 (T2IN) to GND in schematic", "Verify R7/R8/R9 are updated to 680\u03A9 (0402WGF6800TCE)", "Run ERC and DRC in EasyEDA Pro", "Verify SMD RJ45 (RJ-064-1) footprint and C-number", "Export Gerber, BOM, CPL for JLCPCB order", "Optional: Program FT232RL EEPROM via FT_PROG (device description, serial number)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
+      // 8. Design Verification
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Design Verification (REV A)")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("Full electrical review completed 2026-03-13:")] }),
+      ...["FT232RL: all 28 pins verified (TEST\u2192GND, CTS/DSR/DCD/RI\u2192GND, OSCI/OSCO NC)", "MAX3232: charge pump caps correct, ch1 UART\u2194RS232, T2IN (pin 10) tied to GND", "MT3608: boost topology correct, Vout=12.36V, D1 polarity correct", "USB-C: CC pulldowns 5.1k\u03A9, D+/D- through USBLC6, both orientations", "AMS1117: V3V3 \u2192 R6 (10\u03A9) \u2192 RJ45 pin 3, adequate headroom (1.7V)", "LED circuits: active-low CBUS, correct polarity, 3.2\u20134.3mA", "RJ45 pinout matches FLARM IGC specification", "USB D+/D- length matched (24.3mm each)", "Power budget: ~280mA within USB 2.0 500mA limit", "All capacitor voltage ratings \u22651.8\u00D7, all resistor power ratings <40%"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      // 9. Remaining Items
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("9. Remaining Items")] }),
+      ...["Run ERC and DRC in EasyEDA Pro", "Verify SMD RJ45 (RJ-064-1) C-number for JLCPCB", "Export Gerber, BOM, CPL for JLCPCB order", "Test AMS1117 output stability with MLCC caps after build", "Optional: Program FT232RL EEPROM via FT_PROG (device description, serial number)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
     ]
   }]
 });
