@@ -42,7 +42,7 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 | RJ1 | RJ45 SMD 8P8C (RJ-064-1) | — | Extended |
 | J3 | 1×3 PTH header 2.54mm (unpopulated) | — | — |
 | LED1 | Green LED 0805 — power (KT-0805G) | C2297 | Basic |
-| LED2 | Green LED 0805 — TX (KT-0805G) | C2297 | Basic |
+| LED2 | Yellow LED 0805 — TX (KT-0805Y) | C2296 | Basic |
 | LED3 | Yellow LED 0805 — RX (KT-0805Y) | C2296 | Basic |
 | R1 | 100kΩ 0402 — MT3608 FB top | C25741 | Basic |
 | R2 | 5.1kΩ 0402 — MT3608 FB bottom | C25905 | Basic |
@@ -133,7 +133,7 @@ Exposes the TTL-level UART signals (between FT232RL and MAX3232). Not assembled 
 | LED | Colour | Signal | Resistor | Current | Behaviour |
 |-----|--------|--------|----------|---------|-----------|
 | LED1 | Green (C2297) | VUSB → R7 → GND | 680Ω | 3.2mA | Always on when USB connected |
-| LED2 | Green (C2297) | VUSB → R8 → TXLED# | 680Ω | 3.2mA | Flashes during TX |
+| LED2 | Yellow (C2296) | VUSB → R8 → TXLED# | 680Ω | 3.2mA | Flashes during TX |
 | LED3 | Yellow (C2296) | VUSB → R9 → RXLED# | 680Ω | 4.3mA | Flashes during RX |
 
 TXLED# and RXLED# are active-low, default CBUS0/CBUS1 factory config — no EEPROM needed.
