@@ -1,5 +1,10 @@
 # FLARM USB Updater — REV A
 
+> **REV A ERRATA:** The MT3608 boost converter topology is incorrect — L1 and D1
+> are on the wrong side of the switch node. The 12V rail produces 0V. All other
+> circuits (USB, RS232, 3.3V, LEDs) work correctly. See **REV A Errata** section
+> below for details and rework instructions. Fixed in REV C schematic.
+
 USB-to-RS232 adapter with 12V boost converter for updating FLARM firmware without external power.
 
 Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update tool. No 12V bench supply required. Also supports FLARM display firmware updates via the same connector.
@@ -209,7 +214,7 @@ All verified in design review 2026-03-13:
 
 - FT232RL: all 28 pins verified (TEST→GND, CTS/DSR/DCD/RI→GND, OSCI/OSCO NC)
 - MAX3232: charge pump caps correct, ch1 UART↔RS232, T2IN (pin 10) tied to GND
-- MT3608: boost topology correct, 12.36V output, D1 polarity correct
+- ~~MT3608: boost topology correct, 12.36V output, D1 polarity correct~~ **WRONG — see errata**
 - USB-C: CC1/CC2 pull-downs 5.1kΩ, D+/D− through USBLC6, both orientations
 - AMS1117-3.3: V3V3 → R6 (10Ω) → RJ45 pin 3, adequate headroom
 - LED circuits: active-low CBUS, correct polarity, 3.2–4.3mA current
@@ -225,11 +230,53 @@ All verified in design review 2026-03-13:
 - Export Gerber/BOM/CPL for JLCPCB
 - Verify RJ1 SMD RJ45 C-number for JLCPCB availability
 
+## REV A Errata
+
+### E1: MT3608 boost converter topology incorrect — 12V rail dead (0V output)
+
+**Severity:** Critical — 12V rail non-functional on all boards.
+
+**Root cause:** L1 is between SW and VBOOST, and D1 is between VBOOST and V12_OUT.
+The correct boost topology requires L1 between VIN and SW, and D1 between SW and the output.
+
+```
+REV A (wrong):  VUSB ── IN    SW ── L1 ── VBOOST ── D1 ── V12_OUT
+Correct:        VUSB ── L1 ── SW ── D1 ── V12_OUT
+```
+
+Without the inductor between VIN and SW, the MT3608 has no energy storage path.
+The internal FET switches but no current flows through L1 from the input supply.
+
+**Impact:** 12V rail produces 0V. All other circuits (FT232RL, MAX3232, AMS1117-3.3,
+USB-C, LEDs, ESD protection) work normally — they are independent of the boost converter.
+
+**Rework options:**
+
+1. **Desolder and fly-wire** — desolder L1 and D1, bridge D1 pads, resolder both
+   with flying wires in the correct topology. See `Docs/REV_A_Rework_Guide.md`
+   and `Docs/REV_A_Rework_Guide.pdf` for step-by-step instructions.
+
+2. **External boost module** — desolder L1 (disables on-board boost), piggyback an
+   external MT3608 module. Wire module VIN→VUSB, VOUT→V12_OUT, GND→GND.
+   Adjust trimpot to 12V.
+
+**Fixed in:** REV C schematic (EDA/USB_FLARM_UPDATER.eprj).
+
+### E2: FT232RL VCCIO tied to VCC (5V) — J3 header outputs 5V TTL
+
+**Severity:** Minor — 5V TTL works for most targets but is incompatible with
+3.3V-only MCUs (nRF, RP2040, etc.).
+
+**Fixed in:** REV C — VCCIO tied to 3V3OUT (FT_3V3) via short symbol. J3 now
+outputs 3.3V TTL.
+
 ## Files
 
-- `EDA/USB_FLARM_UPDATER.eprj` — EasyEDA Pro project (schematic + PCB)
-- `Docs/schematic.pdf` — schematic PDF export
+- `EDA/USB_FLARM_UPDATER.eprj` — EasyEDA Pro project (REV C schematic + REV A PCB)
+- `Docs/schematic.pdf` — schematic PDF export (REV A — outdated)
 - `Docs/PCB.pdf` — PCB layout PDF export
 - `Docs/FLARM_USB_Updater_Design_Document.docx` — design document for review
+- `Docs/REV_A_Rework_Guide.md` — boost converter rework instructions
+- `Docs/REV_A_Rework_Guide.pdf` — printable one-page rework guide
 - `Datasheets/` — component datasheets (FT232RL, MAX3232, MT3608, AMS1117, etc.)
-- `3D_PCB1_2026-03-12.step` — 3D model export
+- `FLARM_USB_UPDATER.step` — 3D model export

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FLARM USB Updater — PCB 1:1 Print</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #f5f5f5;
+  }
+  h1 { font-size: 14pt; margin-bottom: 4mm; }
+  .info { font-size: 10pt; color: #555; margin-bottom: 8mm; }
+  .pcb-container {
+    width: 53.4mm;
+    height: 30.5mm;
+    position: relative;
+    border: 0.3mm dashed #999;
+  }
+  .pcb-container object,
+  .pcb-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .board-outline {
+    width: 53.4mm;
+    height: 30.5mm;
+    border: 0.5mm solid #000;
+    border-radius: 0.5mm;
+    position: relative;
+    background: #1a3a6a;
+  }
+  .board-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 8pt;
+    text-align: center;
+    line-height: 1.5;
+    font-weight: bold;
+  }
+  .dim {
+    font-size: 9pt;
+    color: #333;
+    text-align: center;
+  }
+  .dim-h { width: 53.4mm; margin-top: 2mm; }
+  .dim-v {
+    position: absolute;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    left: -8mm;
+    top: 0;
+    height: 30.5mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wrapper {
+    position: relative;
+    padding-left: 12mm;
+  }
+  .scale-check {
+    margin-top: 10mm;
+    font-size: 9pt;
+    color: #555;
+  }
+  .ruler-100 {
+    width: 100mm;
+    height: 5mm;
+    border: 0.3mm solid #000;
+    margin-top: 3mm;
+    display: flex;
+  }
+  .ruler-100 div {
+    flex: 1;
+    border-right: 0.3mm solid #000;
+  }
+  .ruler-100 div:nth-child(odd) {
+    background: #000;
+  }
+  .ruler-100 div:last-child {
+    border-right: none;
+  }
+  .note { font-size: 8pt; color: #999; margin-top: 2mm; }
+  .tip { font-size: 9pt; color: #333; margin-top: 6mm; max-width: 160mm; line-height: 1.5; }
+
+  @media print {
+    body { background: white; height: auto; }
+    .no-print { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<h1>FLARM USB Updater — REV A — 1 : 1</h1>
+<p class="info">Board outline at actual size (53.4 x 30.5 mm)</p>
+
+<div class="wrapper">
+  <div class="dim dim-v">30.5 mm</div>
+  <div class="board-outline">
+    <div class="board-label">FLARM USB<br>Updater<br>53.4 x 30.5 mm</div>
+  </div>
+  <div class="dim dim-h">53.4 mm</div>
+</div>
+
+<div class="scale-check">
+  <strong>Scale check — this bar should measure exactly 100 mm with a ruler:</strong>
+  <div class="ruler-100">
+    <div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div>
+  </div>
+  <p class="note">Each segment = 10 mm. If it doesn't match, adjust your printer to "Actual size" / 100% (not "Fit to page").</p>
+</div>
+
+<p class="tip no-print">
+  <strong>To print the full PCB layout at 1:1:</strong> Open <code>Docs/PCB.pdf</code> in your PDF viewer and print at <strong>100% / Actual size</strong>. Use this page to verify your printer scale is correct with the ruler above.
+</p>
+
+</body>
+</html>
