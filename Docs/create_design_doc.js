@@ -23,18 +23,17 @@ const bom = [
   ["U2", "MAX3232CSE+T", "RS232 transceiver (dual)", "SOIC-16", "C7258", "Extended"],
   ["U3", "MT3608", "Step-up DC-DC converter", "SOT-23-6", "C84817", "Extended"],
   ["U4", "AMS1117-3.3", "3.3V LDO regulator", "SOT-223", "C6186", "Basic"],
-  ["D1", "B5819W SL", "Schottky diode (boost)", "SOD-123", "C8598", "Basic"],
+  ["D1", "B5819W SL", "Schottky diode (boost freewheel)", "SOD-123", "C8598", "Basic"],
   ["D2", "USBLC6-2SC6", "USB ESD protection", "SOT-23-6", "C7519", "Extended"],
   ["L1", "SMNR4020-22UH", "22\u00B5H inductor (boost)", "4x4mm SMD", "C135264", "Extended"],
   ["J1", "TYPE-C-31-M-12", "USB-C receptacle", "SMD 12-pin", "C165948", "Extended"],
-  ["RJ1", "RJ-064-1", "RJ45 jack (SMD)", "SMD", "TBD", "Extended"],
+  ["RJ1", "RJ-064-1", "RJ45 jack (SMD)", "SMD", "C7205199", "Extended"],
   ["J3", "HDR-M 1x3P", "TTL UART breakout (unpop.)", "2.54mm PTH", "N/A", "N/A"],
   ["LED1", "KT-0805G", "Power LED (green)", "0805", "C2297", "Basic"],
-  ["LED2", "KT-0805G", "TX LED (green)", "0805", "C2297", "Basic"],
+  ["LED2", "KT-0805Y", "TX LED (yellow)", "0805", "C2296", "Basic"],
   ["LED3", "KT-0805Y", "RX LED (yellow)", "0805", "C2296", "Basic"],
   ["R1", "0402WGF1003TCE", "100k\u03A9 \u00B11% (boost FB top)", "0402", "C25741", "Basic"],
   ["R2", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (boost FB bottom)", "0402", "C25905", "Basic"],
-  ["R3", "0402WGF1002TCE", "10k\u03A9 \u00B11% (boost EN pull-up)", "0402", "C25744", "Basic"],
   ["R4", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (USB CC1)", "0402", "C25905", "Basic"],
   ["R5", "0402WGF5101TCE", "5.1k\u03A9 \u00B11% (USB CC2)", "0402", "C25905", "Basic"],
   ["R6", "0402WGF100JTCE", "10\u03A9 \u00B11% (LDO to RJ45)", "0402", "C25077", "Basic"],
@@ -42,12 +41,12 @@ const bom = [
   ["R8", "0402WGF6800TCE", "680\u03A9 \u00B11% (TX LED)", "0402", "C25130", "Basic"],
   ["R9", "0402WGF6800TCE", "680\u03A9 \u00B11% (RX LED)", "0402", "C25130", "Basic"],
   ["C1", "CL21A226MAQNNNE", "22\u00B5F 25V (boost input)", "0805", "C45783", "Basic"],
-  ["C2", "CL05B104KO5NNNC", "100nF (boost input HF)", "0402", "C307331", "Basic"],
   ["C3", "CL21A226MAQNNNE", "22\u00B5F 25V (boost output)", "0805", "C45783", "Basic"],
-  ["C4", "CL21A475KAQNNNE", "4.7\u00B5F (boost output HF)", "0805", "C1779", "Basic"],
-  ["C5-C9", "CL05B104KO5NNNC", "100nF (MAX3232 charge pump)", "0402", "C307331", "Basic"],
-  ["C10", "CL21A475KAQNNNE", "4.7\u00B5F (FT232RL VCC)", "0805", "C1779", "Basic"],
-  ["C11-C14", "CL05B104KO5NNNC", "100nF (FT232RL decoupling)", "0402", "C307331", "Basic"],
+  ["C5", "CL05B104KB54PNC", "100nF (MAX3232 VCC decoupling)", "0402", "C307331", "Basic"],
+  ["C6-C9", "CL05B104KB54PNC", "100nF (MAX3232 charge pump + V+/V-)", "0402", "C307331", "Basic"],
+  ["C10", "CL21A475KAQNNNE", "4.7\u00B5F (FT232RL VCC bulk)", "0805", "C1779", "Basic"],
+  ["C11-C13", "CL05B104KB54PNC", "100nF (FT232RL VCC/VCCIO decoupling)", "0402", "C307331", "Basic"],
+  ["C14", "CL05B104KB54PNC", "100nF (USBLC6 VCC)", "0402", "C307331", "Basic"],
   ["C15", "CL21A226MAQNNNE", "22\u00B5F 25V (LDO input)", "0805", "C45783", "Basic"],
   ["C16", "CL21A226MAQNNNE", "22\u00B5F 25V (LDO output)", "0805", "C45783", "Basic"],
 ];
@@ -65,25 +64,29 @@ const rj45pins = [
 
 const nets = [
   ["VUSB", "USB 5V supply from USB-C"],
-  ["GND", "Ground"],
-  ["VBOOST", "Boost converter output (~12.36V)"],
-  ["V12_OUT", "12V after Schottky diode (~12.0V)"],
-  ["V3V3", "3.3V LDO output"],
+  ["GND", "Ground (pour both layers)"],
+  ["SW", "Boost switch node (L1 \u2192 U3 SW \u2192 D1 anode)"],
+  ["V12_OUT", "Boost output after Schottky D1 (~12.0V)"],
+  ["FB", "Boost feedback divider midpoint (0.6V ref)"],
+  ["V3V3", "AMS1117 3.3V output"],
   ["V3V3_OUT", "3.3V to FLARM via R6 (10\u03A9)"],
-  ["UD+", "USB data positive"],
-  ["UD-", "USB data negative"],
-  ["CC1", "USB-C configuration channel 1"],
-  ["CC2", "USB-C configuration channel 2"],
-  ["UART_TX", "TTL-level TX (FT232RL to MAX3232)"],
-  ["UART_RX", "TTL-level RX (MAX3232 to FT232RL)"],
-  ["RS232_TX", "RS232-level TX (to FLARM RX)"],
-  ["RS232_RX", "RS232-level RX (from FLARM TX)"],
+  ["FT_3V3", "FT232RL 3V3OUT (pin 17, C12 decoupling only)"],
+  ["UD+", "USB data positive (differential pair, post-ESD)"],
+  ["UD-", "USB data negative (differential pair, post-ESD)"],
+  ["UD_IN+", "USB data positive (USB-C side of USBLC6)"],
+  ["UD_IN-", "USB data negative (USB-C side of USBLC6)"],
+  ["CC1", "USB-C configuration channel 1 (5.1k\u03A9 to GND)"],
+  ["CC2", "USB-C configuration channel 2 (5.1k\u03A9 to GND)"],
+  ["UART_TX", "TTL-level TX (FT232RL \u2192 MAX3232 / J3)"],
+  ["UART_RX", "TTL-level RX (MAX3232 / J3 \u2192 FT232RL)"],
+  ["RS232_TX", "RS232-level TX (to FLARM RX on RJ45)"],
+  ["RS232_RX", "RS232-level RX (from FLARM TX on RJ45)"],
   ["TXLED", "FT232RL CBUS0 (active-low TX indicator)"],
   ["RXLED", "FT232RL CBUS1 (active-low RX indicator)"],
-  ["SW", "Boost converter switch node (L1 to U3)"],
-  ["FB", "Boost feedback divider midpoint"],
-  ["EN", "Boost converter enable (pulled high via R3)"],
-  ["FT_3V3", "FT232RL internal 3.3V output (C12 decoupling)"],
+  ["CP1P/CP1N", "MAX3232 charge pump 1 flying cap (C6)"],
+  ["CP2P/CP2N", "MAX3232 charge pump 2 flying cap (C7)"],
+  ["VS_POS/VS_NEG", "MAX3232 \u00B1 supply (C8/C9)"],
+  ["LED1_K/LED2_K/LED3_K", "LED cathode nodes"],
 ];
 
 function makeTable(headers, rows, colWidths) {
@@ -126,9 +129,9 @@ const doc = new Document({
       // Title
       new Paragraph({ heading: HeadingLevel.TITLE, children: [new TextRun("FLARM USB Updater")] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "Hardware Design Document", size: 28, color: "2E5E8E", font: "Arial" })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "REV A", size: 24, bold: true, color: "1B3A5C", font: "Arial" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "REV B", size: 24, bold: true, color: "1B3A5C", font: "Arial" })] }),
       new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 100 }, children: [new TextRun({ text: "PCB: 53.4 \u00D7 30.5 mm (2102 \u00D7 1200 mil), 2-layer FR4", size: 20, color: "666666" })] }),
-      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: "March 2026", size: 20, color: "666666" })] }),
+      new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 400 }, children: [new TextRun({ text: "April 2026", size: 20, color: "666666" })] }),
 
       // 1. Overview
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("1. Overview")] }),
@@ -156,7 +159,7 @@ const doc = new Document({
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("The design consists of five functional blocks:")] }),
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.1 Power Supply")] }),
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "Boost Converter (MT3608): ", bold: true }), new TextRun("Converts 5V USB to ~12.36V. Feedback divider R1 (100k\u03A9) / R2 (5.1k\u03A9) sets Vout = 0.6 \u00D7 (1 + R1/R2) = 12.36V. Schottky diode D1 (B5819W) drops ~0.36V, yielding ~12.0V at V12_OUT. L1 is a 22\u00B5H inductor (top of MT3608 recommended range) chosen for lower peak current and ripple at our light load (~85mA).")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "Boost Converter (MT3608): ", bold: true }), new TextRun("Standard boost topology. L1 (22\u00B5H) sits between VUSB and SW node. MT3608 internal FET switches SW to GND; Schottky D1 (B5819W) conducts when FET opens, storing L1's magnetic energy into C3. Feedback divider R1 (100k\u03A9) / R2 (5.1k\u03A9) sets Vout = 0.6 \u00D7 (1 + R1/R2) \u2248 12.35V, yielding ~12.0V at RJ45 after the ~0.35V D1 drop. 22\u00B5H is the top of the MT3608 recommended range, chosen for lower peak current and output ripple at the ~85mA FLARM load.")] }),
       new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "LDO (AMS1117-3.3): ", bold: true }), new TextRun("Provides 3.3V from USB 5V for FLARM pin 3. R6 (10\u03A9) limits current between the LDO output and FLARM's internal 3.3V regulator to prevent backfeed.")] }),
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "Power Budget: ", bold: true }), new TextRun("Classic FLARM draws ~85mA at 12V. Total USB current: ~280mA, well within any USB port's capability.")] }),
 
@@ -167,11 +170,11 @@ const doc = new Document({
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL (U1) converts USB to TTL UART. Chosen over CH340C because the November 2024 Windows Update broke CH340 drivers; FT232RL uses the built-in usbser.sys driver. CBUS0 (TXLED#) and CBUS1 (RXLED#) drive status LEDs via active-low outputs. Pin 26 (TEST) tied to GND. Unused modem control inputs (RI#, DSR#, DCD#, CTS#) tied to GND.")] }),
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.4 RS232 Level Converter")] }),
-      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("MAX3232 (U2) converts TTL UART to RS232 levels using charge pump capacitors C5-C9 (all 100nF). Channel 1 is used for FLARM communication. Channel 2 is unused; T2IN (pin 10) must be tied to GND to prevent floating input oscillation.")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("MAX3232 (U2) converts TTL UART to RS232 levels. C5 is VCC bypass (pin 16). C6/C7 are the charge pump flying caps (C1\u00B1/C2\u00B1). C8/C9 are V+/V- storage caps. All five are 100nF, which is the MAX3232 datasheet value for 3V\u20135.5V operation. Channel 1 carries FLARM communication. Channel 2 is unused; T2IN (pin 10) is tied to GND to prevent floating-input oscillation; the other channel-2 pins are left floating (allowed by datasheet).")] }),
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.5 LED Indicators")] }),
       new Paragraph({ spacing: { after: 100 }, children: [new TextRun("All LEDs use the same topology: VUSB \u2192 LED anode (pin 1) \u2192 LED cathode (pin 2) \u2192 R \u2192 sink.")] }),
-      ...["LED1 (green, KT-0805G): Power indicator. R7 (680\u03A9) to GND. Always on. I = (5-2.8)/680 = 3.2mA.", "LED2 (green, KT-0805G): TX activity. R8 (680\u03A9) to TXLED (CBUS0). I = (5-2.8)/680 = 3.2mA when active.", "LED3 (yellow, KT-0805Y): RX activity. R9 (680\u03A9) to RXLED (CBUS1). I = (5-2.1)/680 = 4.3mA when active."].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      ...["LED1 (green, KT-0805G): Power indicator. R7 (680\u03A9) to GND. Always on. I = (5-2.8)/680 = 3.2mA.", "LED2 (yellow, KT-0805Y): TX activity. R8 (680\u03A9) to TXLED (CBUS0). I = (5-2.1)/680 = 4.3mA when active.", "LED3 (yellow, KT-0805Y): RX activity. R9 (680\u03A9) to RXLED (CBUS1). I = (5-2.1)/680 = 4.3mA when active."].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
 
       // 3. RJ45 Pinout
       new Paragraph({ children: [new PageBreak()] }),
@@ -186,7 +189,7 @@ const doc = new Document({
       // 5. BOM
       new Paragraph({ children: [new PageBreak()] }),
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("5. Bill of Materials")] }),
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("38 SMT components. 7 Extended parts (\u00D7 $3 = $21 setup fee). J3 is unpopulated (hand-solder when needed).")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("34 SMT components + 1 PTH (J3 unpopulated). 7 Extended parts (\u00D7 $3 = $21 setup fee). REV B removed R3 (EN pull-up \u2014 EN tied directly to VUSB), C2 (boost input HF), and C4 (boost output aux) \u2014 none required by the MT3608 datasheet.")] }),
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun({ text: "Estimated cost: 5 boards \u2248 $16.70/ea, 10 boards \u2248 $12.30/ea", bold: true, size: 20 })] }),
       makeTable(["Ref", "Part", "Description", "Package", "LCSC", "Class"], bom, [900, 2400, 2800, 1200, 1100, 960]),
 
@@ -194,7 +197,7 @@ const doc = new Document({
       new Paragraph({ children: [new PageBreak()] }),
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("6. PCB Design")] }),
       new Paragraph({ spacing: { after: 100 }, children: [new TextRun({ text: "Board: 53.4 \u00D7 30.5 mm (2102 \u00D7 1200 mil), 2-layer FR4, 1oz copper.", bold: true })] }),
-      ...["GND copper pour on both layers (164 poured regions)", "51 vias (49 GND, 2 VUSB) for ground plane stitching", "Power traces (VUSB, VBOOST, SW, V3V3): 20mil", "V12_OUT traces: 15mil", "Signal traces (UART, RS232, USB, LED): 10mil", "USB differential pair (UD+/UD-): length matched at 24.3mm", "312 trace segments across 29 routed nets", "Designed in EasyEDA Pro, manufactured by JLCPCB"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      ...["GND copper pour on both layers; top pour fills gaps between traces, bottom is a solid GND plane", "All signal routing on top layer (single-sided routed) \u2014 bottom reserved for uninterrupted GND return", "54 vias for GND stitching and bottom-plane pad connections", "Net class rules: Power (VUSB) \u2265 20mil, Power_12V (V12_OUT) \u2265 15mil", "USB differential pair (UD+/UD-, UD_IN+/UD_IN-): 6mil/6mil width/space, diff-pair rule active", "Designed in EasyEDA Pro, assembled by JLCPCB"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
 
       // 7. Design Decisions
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("7. Key Design Decisions")] }),
@@ -210,13 +213,40 @@ const doc = new Document({
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("KT-0805G (green) has a maximum forward current of 5mA. With 680\u03A9: I = (5-2.8)/680 = 3.2mA, providing comfortable margin. Yellow LEDs run at 4.3mA. Both values produce adequate brightness (430mcd green, 175mcd yellow).")] }),
 
       // 8. Design Verification
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Design Verification (REV A)")] }),
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("Full electrical review completed 2026-03-13:")] }),
-      ...["FT232RL: all 28 pins verified (TEST\u2192GND, CTS/DSR/DCD/RI\u2192GND, OSCI/OSCO NC)", "MAX3232: charge pump caps correct, ch1 UART\u2194RS232, T2IN (pin 10) tied to GND", "MT3608: boost topology correct, Vout=12.36V, D1 polarity correct", "USB-C: CC pulldowns 5.1k\u03A9, D+/D- through USBLC6, both orientations", "AMS1117: V3V3 \u2192 R6 (10\u03A9) \u2192 RJ45 pin 3, adequate headroom (1.7V)", "LED circuits: active-low CBUS, correct polarity, 3.2\u20134.3mA", "RJ45 pinout matches FLARM IGC specification", "USB D+/D- length matched (24.3mm each)", "Power budget: ~280mA within USB 2.0 500mA limit", "All capacitor voltage ratings \u22651.8\u00D7, all resistor power ratings <40%"].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Changes from REV A")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("REV A was ordered, received, and bench-tested. RS232, USB, 3.3V rail, and LEDs all worked. The 12V boost rail produced 0V due to incorrect L1/D1 placement. REV B fixes this; a single other known issue (VCCIO on 5V) is deferred.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("Fixed in REV B")] }),
+      ...[
+        "Boost topology corrected \u2014 L1 now between VUSB and SW (was between SW and output); D1 now between SW and V12_OUT (was between boost output and V12_OUT). Standard textbook boost.",
+        "Removed R3 (10k\u03A9 EN pull-up) \u2014 MT3608 EN tied directly to VUSB.",
+        "Removed C2 (100nF boost input HF) \u2014 not required by datasheet; C1 (22\u00B5F) suffices.",
+        "Removed C4 (4.7\u00B5F boost output aux) \u2014 not required by datasheet; C3 (22\u00B5F) suffices.",
+        "VBOOST net eliminated \u2014 SW \u2192 D1 \u2192 V12_OUT is one continuous output path.",
+        "LED2 colour corrected in documentation: KT-0805Y (yellow), matches physical BOM."
+      ].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("Deferred (not fixed in REV B)")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL VCCIO (pin 4) is still tied to VUSB (5V). UART signals on the J3 header are 5V TTL. This is fine for MAX3232 (3\u20135.5V tolerant) and for 5V-tolerant external MCUs, but not safe for 3.3V-only targets via J3. Fix planned: tie VCCIO to FT_3V3 (pin 17) in a future revision. Low priority \u2014 main use case is the RS232 path to FLARM, unaffected by VCCIO voltage.")] }),
 
-      // 9. Remaining Items
-      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("9. Remaining Items")] }),
-      ...["Run ERC and DRC in EasyEDA Pro", "Verify SMD RJ45 (RJ-064-1) C-number for JLCPCB", "Export Gerber, BOM, CPL for JLCPCB order", "Test AMS1117 output stability with MLCC caps after build", "Optional: Program FT232RL EEPROM via FT_PROG (device description, serial number)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
+      // 9. Verification
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("9. Design Verification (REV B)")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("Netlist and BOM review completed 2026-04-20 against REV B EasyEDA project export:")] }),
+      ...[
+        "FT232RL: all 28 pins verified (TEST\u2192GND, CTS/DSR/DCD/RI\u2192GND, OSCI/OSCO NC, VCCIO on VUSB=5V)",
+        "MAX3232: C5 is VCC bypass; C6/C7 charge pumps; C8/C9 V\u00B1 storage. Ch1 UART\u2194RS232, T2IN (pin 10) tied to GND",
+        "MT3608: VUSB\u2192L1\u2192SW\u2192D1\u2192V12_OUT. Feedback 100k/5.1k gives 12.35V. Boost topology now correct",
+        "USB-C: CC1/CC2 pulldowns 5.1k\u03A9, D+/D- through USBLC6 (diff-pair rule active), both orientations",
+        "AMS1117: V3V3 \u2192 R6 (10\u03A9) \u2192 RJ45 pin 3, adequate headroom (1.7V)",
+        "LED circuits: active-low CBUS, correct polarity, 3.2\u20134.3mA (LED2 now correctly yellow)",
+        "RJ45 pinout matches FLARM IGC specification (SMD connector uses reversed pad numbering, compensated in routing)",
+        "USB D+/D- configured as differential pair (DP1, DP2), 6mil/6mil",
+        "GND pour both layers, 54 stitching vias",
+        "Power budget: ~280mA within USB 2.0 500mA limit",
+        "All capacitor voltage ratings \u22651.8\u00D7, all resistor power ratings <40%"
+      ].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
+
+      // 10. Status
+      new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("10. Status & Next Steps")] }),
+      ...["REV B fabrication files exported (Gerber, BOM, Pick-and-Place) \u2014 ready for JLCPCB order", "Bring-up plan: verify 12V at RJ45 pins 1/2 with DMM before connecting FLARM", "Validate USB enumeration, TX/RX loopback via monitor_com11.py / poke_flarm.py", "Program FT232RL EEPROM via FT_PROG (device description, unique serial) \u2014 optional", "Future REV: move VCCIO to 3.3V (J3 header at 3.3V TTL for 3.3V-only targets)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
     ]
   }]
 });
