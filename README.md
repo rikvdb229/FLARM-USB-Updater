@@ -6,6 +6,8 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 
 > **Status:** REV B fab-ready. Fixes the REV A boost topology bug (12V rail was dead on all REV A boards). See [Archive/REV_A/](Archive/REV_A/) for the REV A schematic, rework guide, and bring-up log.
 
+> **Disclaimer:** This is an unofficial, community-built project. It is **not affiliated with, authorized, sponsored, or endorsed by FLARM Technology Ltd.** "FLARM" and "PowerFLARM" are trademarks of FLARM Technology Ltd.; they are used here only to describe device compatibility. Firmware updates are performed using FLARM's own official update tool — this project supplies power and a serial connection only. Use at your own risk; you are responsible for any device you connect it to.
+
 ## Features
 
 - Powered entirely from USB (5V)

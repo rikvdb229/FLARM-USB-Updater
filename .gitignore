@@ -26,3 +26,6 @@ package-lock.json
 EDA/extracted/
 EDA/*_backup/
 EDA/*.json
+
+# Logs
+*.log
