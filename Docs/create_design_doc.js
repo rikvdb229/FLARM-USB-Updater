@@ -170,7 +170,7 @@ const doc = new Document({
       new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL (U1) converts USB to TTL UART. Chosen over CH340C because the November 2024 Windows Update broke CH340 drivers; FT232RL uses the built-in usbser.sys driver. CBUS0 (TXLED#) and CBUS1 (RXLED#) drive status LEDs via active-low outputs. Pin 26 (TEST) tied to GND. Unused modem control inputs (RI#, DSR#, DCD#, CTS#) tied to GND.")] }),
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.4 RS232 Level Converter")] }),
-      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("MAX3232 (U2) converts TTL UART to RS232 levels. C5 is VCC bypass (pin 16). C6/C7 are the charge pump flying caps (C1\u00B1/C2\u00B1). C8/C9 are V+/V- storage caps. All five are 100nF, which is the MAX3232 datasheet value for 3V\u20135.5V operation. Channel 1 carries FLARM communication. Channel 2 is unused; T2IN (pin 10) is tied to GND to prevent floating-input oscillation; the other channel-2 pins are left floating (allowed by datasheet).")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("MAX3232 (U2) converts TTL UART to RS232 levels. U2 is powered from the 3.3V rail (V3V3, AMS1117 output on the regulator side of R6), so the FT232RL\u2194MAX3232 interface is level-matched at 3.3V in both directions with in-spec margin (MAX3232 driver V_IH = 2.0V at VCC = 3.3V; FT232RL TXD high = 2.2V min at VCCIO = 3.3V). C5 is VCC bypass (pin 16). C6/C7 are the charge pump flying caps (C1\u00B1/C2\u00B1). C8/C9 are V+/V- storage caps. All five are 100nF, which is the MAX3232 datasheet value for 3V\u20135.5V operation. Channel 1 carries FLARM communication. Channel 2 is unused; T2IN (pin 10) is tied to GND to prevent floating-input oscillation; the other channel-2 pins are left floating (allowed by datasheet).")] }),
 
       new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun("2.5 LED Indicators")] }),
       new Paragraph({ spacing: { after: 100 }, children: [new TextRun("All LEDs use the same topology: VUSB \u2192 LED anode (pin 1) \u2192 LED cathode (pin 2) \u2192 R \u2192 sink.")] }),
@@ -214,7 +214,7 @@ const doc = new Document({
 
       // 8. Design Verification
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("8. Changes from REV A")] }),
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("REV A was ordered, received, and bench-tested. RS232, USB, 3.3V rail, and LEDs all worked. The 12V boost rail produced 0V due to incorrect L1/D1 placement. REV B fixes this; a single other known issue (VCCIO on 5V) is deferred.")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("REV A was ordered, received, and bench-tested. RS232, USB, 3.3V rail, and LEDs all worked. The 12V boost rail produced 0V due to incorrect L1/D1 placement. REV B fixes this and refines the MAX3232 supply; there are no deferred electrical issues.")] }),
       new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("Fixed in REV B")] }),
       ...[
         "Boost topology corrected \u2014 L1 now between VUSB and SW (was between SW and output); D1 now between SW and V12_OUT (was between boost output and V12_OUT). Standard textbook boost.",
@@ -222,17 +222,18 @@ const doc = new Document({
         "Removed C2 (100nF boost input HF) \u2014 not required by datasheet; C1 (22\u00B5F) suffices.",
         "Removed C4 (4.7\u00B5F boost output aux) \u2014 not required by datasheet; C3 (22\u00B5F) suffices.",
         "VBOOST net eliminated \u2014 SW \u2192 D1 \u2192 V12_OUT is one continuous output path.",
-        "LED2 colour corrected in documentation: KT-0805Y (yellow), matches physical BOM."
+        "LED2 colour corrected in documentation: KT-0805Y (yellow), matches physical BOM.",
+        "MAX3232 supply \u2014 VCC (U2 pin 16) and bypass cap C5 moved from VUSB (5V) to the 3.3V rail (V3V3, AMS1117 output on the regulator side of R6). Closes a worst-case out-of-spec logic-high margin: a 5V-powered MAX3232 needs 2.4V V_IH but the FT232RL TXD only guarantees 2.2V at VCCIO=3.3V. At VCC=3.3V the MAX3232 V_IH is 2.0V \u2014 in spec. Both ICs now share the 3.3V rail."
       ].map(t => new Paragraph({ numbering: { reference: "bullet-list", level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text: t, size: 20 })] })),
-      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("Deferred (not fixed in REV B)")] }),
-      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL VCCIO (pin 4) is still tied to VUSB (5V). UART signals on the J3 header are 5V TTL. This is fine for MAX3232 (3\u20135.5V tolerant) and for 5V-tolerant external MCUs, but not safe for 3.3V-only targets via J3. Fix planned: tie VCCIO to FT_3V3 (pin 17) in a future revision. Low priority \u2014 main use case is the RS232 path to FLARM, unaffected by VCCIO voltage.")] }),
+      new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun("FT232RL VCCIO / J3 logic level")] }),
+      new Paragraph({ spacing: { after: 200 }, children: [new TextRun("FT232RL VCCIO (pin 4) is tied to 3V3OUT (pin 17, the FT232RL's internal 3.3V regulator), so the J3 breakout header is 3.3V TTL \u2014 safe to connect directly to any 3.3V MCU (nRF, RP2040, ESP32, STM32). FT232RL VCC (pin 20) is on USB 5V, which powers the USB interface only and does not set the I/O logic level. There are no deferred electrical issues.")] }),
 
       // 9. Verification
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("9. Design Verification (REV B)")] }),
-      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("Netlist and BOM review completed 2026-04-20 against REV B EasyEDA project export:")] }),
+      new Paragraph({ spacing: { after: 100 }, children: [new TextRun("Netlist and BOM review, re-verified 2026-05-15 against the REV B EasyEDA project export (programmatic netlist parse cross-checked against component datasheets):")] }),
       ...[
-        "FT232RL: all 28 pins verified (TEST\u2192GND, CTS/DSR/DCD/RI\u2192GND, OSCI/OSCO NC, VCCIO on VUSB=5V)",
-        "MAX3232: C5 is VCC bypass; C6/C7 charge pumps; C8/C9 V\u00B1 storage. Ch1 UART\u2194RS232, T2IN (pin 10) tied to GND",
+        "FT232RL: all 28 pins verified (TEST\u2192GND, CTS/DSR/DCD/RI\u2192GND, OSCI/OSCO NC, VCC on VUSB=5V, VCCIO on FT_3V3=3.3V)",
+        "MAX3232: VCC on V3V3 (3.3V rail); C5 is VCC bypass; C6/C7 charge pumps; C8/C9 V\u00B1 storage. Ch1 UART\u2194RS232, T2IN (pin 10) tied to GND",
         "MT3608: VUSB\u2192L1\u2192SW\u2192D1\u2192V12_OUT. Feedback 100k/5.1k gives 12.35V. Boost topology now correct",
         "USB-C: CC1/CC2 pulldowns 5.1k\u03A9, D+/D- through USBLC6 (diff-pair rule active), both orientations",
         "AMS1117: V3V3 \u2192 R6 (10\u03A9) \u2192 RJ45 pin 3, adequate headroom (1.7V)",
@@ -246,7 +247,7 @@ const doc = new Document({
 
       // 10. Status
       new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun("10. Status & Next Steps")] }),
-      ...["REV B fabrication files exported (Gerber, BOM, Pick-and-Place) \u2014 ready for JLCPCB order", "Bring-up plan: verify 12V at RJ45 pins 1/2 with DMM before connecting FLARM", "Validate USB enumeration, TX/RX loopback via monitor_com11.py / poke_flarm.py", "Program FT232RL EEPROM via FT_PROG (device description, unique serial) \u2014 optional", "Future REV: move VCCIO to 3.3V (J3 header at 3.3V TTL for 3.3V-only targets)"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
+      ...["REV B fabrication files exported (Gerber, BOM, Pick-and-Place) \u2014 ready for JLCPCB order", "Bring-up plan: verify 12V at RJ45 pins 1/2 with DMM before connecting FLARM", "Validate USB enumeration, TX/RX loopback via monitor_com11.py / poke_flarm.py", "Program FT232RL EEPROM via FT_PROG (device description, unique serial) \u2014 optional"].map(t => new Paragraph({ numbering: { reference: "num-todo", level: 0 }, spacing: { after: 80 }, children: [new TextRun({ text: t, size: 20 })] })),
     ]
   }]
 });

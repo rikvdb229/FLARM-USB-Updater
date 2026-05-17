@@ -11,7 +11,7 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 - Powered entirely from USB (5V)
 - 5V → ~12V boost converter (MT3608) supplies FLARM via RJ45 pins 1 & 2
 - FT232RL USB-to-UART bridge — uses Microsoft built-in usbser.sys, no driver install on Win10/11
-- MAX3232 RS232 level shifter (±9V signaling, compatible with all FLARM RS232 ports)
+- MAX3232 RS232 level shifter, powered from the 3.3V rail (±5V signaling, RS232-compliant with all FLARM RS232 ports)
 - B5819W Schottky boost freewheel diode — also provides backfeed protection into live 12V aircraft bus
 - USB ESD protection (USBLC6-2SC6) on D+/D−
 - USB-C connector with proper CC pull-downs
@@ -56,7 +56,7 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 | R9   | 680Ω 0402 — RX LED                         | C25130   | Basic    |
 | C1   | 22µF / 25V 0805 — MT3608 Vin               | C45783   | Basic    |
 | C3   | 22µF / 25V 0805 — MT3608 Vout              | C45783   | Basic    |
-| C5   | 100nF 0402 — MAX3232 VCC bypass            | C307331  | Basic    |
+| C5   | 100nF 0402 — MAX3232 VCC bypass (3.3V rail)| C307331  | Basic    |
 | C6   | 100nF 0402 — MAX3232 C1+/C1− (charge pump) | C307331  | Basic    |
 | C7   | 100nF 0402 — MAX3232 C2+/C2− (charge pump) | C307331  | Basic    |
 | C8   | 100nF 0402 — MAX3232 V+ storage            | C307331  | Basic    |
@@ -126,11 +126,11 @@ Exposes the TTL-level UART signals between the FT232RL and MAX3232. Not assemble
 
 | Pin | Signal | Description            |
 | --- | ------ | ---------------------- |
-| 1   | TX     | 5V TTL TX from FT232RL |
-| 2   | RX     | 5V TTL RX to FT232RL   |
+| 1   | TX     | 3.3V TTL TX from FT232RL |
+| 2   | RX     | 3.3V TTL RX to FT232RL   |
 | 3   | GND    | Signal reference       |
 
-> **VCCIO note:** In REV B the FT232RL VCCIO (pin 4) is tied to VUSB (5V), so J3 outputs **5V TTL**. This is safe for MAX3232 (3–5.5V tolerant) and for 5V-tolerant targets. Do not connect J3 directly to 3.3V-only MCUs (nRF, RP2040, ESP32, etc.) without level shifting. Planned for a future revision: move VCCIO to 3V3OUT so J3 outputs 3.3V TTL.
+> **VCCIO note:** The FT232RL VCCIO (pin 4) is tied to 3V3OUT (the FT232RL's internal 3.3V regulator), so J3 outputs **3.3V TTL** and is safe to connect directly to 3.3V MCUs (nRF, RP2040, ESP32, STM32, etc.). FT232RL VCC (pin 20) remains on USB 5V — that powers the USB interface and does not affect the I/O logic level. The MAX3232 is also powered from the 3.3V rail, so the FT232RL↔MAX3232 interface is level-matched on both directions with in-spec margin.
 
 ### LED Indicators
 
@@ -227,17 +227,14 @@ REV A was ordered, received, and bench-tested. RS232, USB, 3.3V rail, and LEDs a
 4. **Removed C4** (4.7µF boost output aux) — not required by MT3608 datasheet.
 5. **VBOOST net eliminated** — SW→D1→V12_OUT is one path.
 6. **LED2 colour** — corrected from green to yellow (KT-0805Y / C2296) to match physical BOM.
-
-**Deferred to a future revision:**
-
-- FT232RL VCCIO still tied to VUSB (5V). J3 header outputs 5V TTL. Fine for MAX3232 and 5V-tolerant targets. Not safe for 3.3V-only MCUs via J3.
+7. **MAX3232 supply** — VCC (U2 pin 16) and its bypass cap C5 moved from VUSB (5V) to the 3.3V rail (AMS1117 V3V3, regulator side of R6). At VCC=3.3V the MAX3232 driver input threshold is 2.0V, which the FT232RL TXD (2.2V min at VCCIO=3.3V) meets in spec; previously the 5V-powered MAX3232 needed 2.4V and was out of spec worst-case. Both ICs now share the 3.3V rail (level-matched). J3 is therefore 3.3V TTL — safe for any 3.3V MCU.
 
 ## Design Verification (REV B)
 
-Netlist + BOM review 2026-04-20 against REV B EasyEDA project export:
+Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project export (programmatic netlist parse against component datasheets):
 
-- FT232RL: all 28 pins verified (TEST→GND, CTS/DSR/DCD/RI→GND, OSCI/OSCO NC, VCCIO on VUSB=5V)
-- MAX3232: C5 VCC bypass; C6/C7 charge pump flying caps; C8/C9 V+/V− storage. Ch1 UART↔RS232. T2IN (pin 10) tied to GND.
+- FT232RL: all 28 pins verified (TEST→GND, CTS/DSR/DCD/RI→GND, OSCI/OSCO NC, VCC on VUSB=5V, VCCIO on FT_3V3=3.3V)
+- MAX3232: VCC on V3V3 (3.3V rail); C5 VCC bypass; C6/C7 charge pump flying caps; C8/C9 V+/V− storage. Ch1 UART↔RS232. T2IN (pin 10) tied to GND.
 - MT3608: VUSB→L1→SW→D1→V12_OUT. Feedback 100k/5.1k → 12.35V. **Boost topology correct (REV A bug fixed).**
 - USB-C: CC1/CC2 pulldowns 5.1kΩ, D+/D− through USBLC6, diff-pair rule active (DP1, DP2, 6/6 mil), both orientations
 - AMS1117-3.3: V3V3 → R6 (10Ω) → RJ45 pin 3, adequate headroom
@@ -258,10 +255,7 @@ Netlist + BOM review 2026-04-20 against REV B EasyEDA project export:
 ## Files
 
 - [EDA/USB_FLARM_UPDATER.eprj](EDA/USB_FLARM_UPDATER.eprj) — EasyEDA Pro project (REV B)
-- [EDA/Gerber_PCB1_2026-04-20.zip](EDA/Gerber_PCB1_2026-04-20.zip) — REV B Gerber export
-- [EDA/BOM_Board1_PCB1_2026-04-20.csv](EDA/BOM_Board1_PCB1_2026-04-20.csv) — REV B BOM
-- [EDA/Netlist_PCB1_2026-04-20.tel](EDA/Netlist_PCB1_2026-04-20.tel) — REV B netlist
-- [EDA/USB_FLARM_UPDATER_backup/](EDA/USB_FLARM_UPDATER_backup/) — dated project snapshots (including `ProPrj_USB_FLARM_UPDATER_2026-04-20.epro`)
+- [EDA/USB_FLARM_UPDATER_backup/](EDA/USB_FLARM_UPDATER_backup/) — dated project snapshots
 - [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — generated design document
 - [Docs/create_design_doc.js](Docs/create_design_doc.js) — design document generator (`npm install docx && node Docs/create_design_doc.js`)
 - [Datasheets/](Datasheets/) — component datasheets
