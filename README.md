@@ -264,3 +264,16 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 - [FLARM_USB_UPDATER.step](FLARM_USB_UPDATER.step) — 3D model export
 - [Archive/REV_A/](Archive/REV_A/) — REV A schematic, PCB, BOM, Gerber, rework guide, bring-up log
 - [monitor_com11.py](monitor_com11.py), [poke_flarm.py](poke_flarm.py) — serial bring-up and test scripts
+- [LICENSE](LICENSE) — CERN-OHL-S v2 licence text
+
+## License
+
+Copyright Rik Vanden Boer.
+
+This source describes Open Hardware and is licensed under the **CERN-OHL-S v2** (CERN Open Hardware Licence Version 2 — Strongly Reciprocal). You may redistribute and modify this source and make products using it under the terms of CERN-OHL-S v2 ([LICENSE](LICENSE)).
+
+This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY, INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A PARTICULAR PURPOSE. Please see the licence for the full text.
+
+As a strongly reciprocal licence: if you make and distribute a (modified) board based on this design, you must make the complete source (schematics, PCB, BOM) available under the same licence.
+
+"FLARM" and "PowerFLARM" are trademarks of FLARM Technology Ltd. and are **not** covered by this licence — see the disclaimer at the top of this document.
