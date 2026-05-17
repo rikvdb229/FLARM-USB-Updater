@@ -253,6 +253,6 @@ const doc = new Document({
 });
 
 Packer.toBuffer(doc).then(buffer => {
-  fs.writeFileSync("d:\\CodeProjects\\FLARM-USB-Updater\\Docs\\FLARM_USB_Updater_Design_Document.docx", buffer);
+  fs.writeFileSync(require("path").join(__dirname, "FLARM_USB_Updater_Design_Document.docx"), buffer);
   console.log("Design document created successfully.");
 });
