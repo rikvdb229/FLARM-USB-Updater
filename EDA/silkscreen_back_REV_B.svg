@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="53.4mm" height="30.5mm" viewBox="0 0 53.4 30.5"
+     role="img" aria-label="USB FLARM UPDATER REV B - back silkscreen">
+  <!--
+    PCB BACK SILKSCREEN - USB FLARM UPDATER REV B
+    Board size: 53.4 x 30.5 mm (1:1, units = mm). Origin = board top-left.
+    Content is centered and kept clear of the four corner GND mounting pads.
+    Color is black for on-screen preview only; map all geometry to the
+    bottom silkscreen layer in EasyEDA.
+    NOT pre-mirrored - EasyEDA mirrors automatically when the graphic is
+    placed on the bottom layer.
+    Before importing: convert all <text> to outlines (Inkscape:
+    Path > Object to Path) so it does not depend on installed fonts.
+  -->
+
+  <!-- ===== RVdB.dev logo (octagon, vector) ===== -->
+  <g transform="translate(18.7 1.2) scale(0.0851)">
+    <polygon points="16,6 172,6 182,16 182,88 172,98 16,98 6,88 6,16"
+             fill="none" stroke="#000" stroke-width="6" stroke-linejoin="miter"/>
+    <text x="94" y="58" text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif" font-weight="700"
+          font-size="44" letter-spacing="2" fill="#000">RVdB</text>
+    <line x1="20" y1="68" x2="168" y2="68" stroke="#000" stroke-width="3"/>
+    <text x="168" y="86" text-anchor="end"
+          font-family="'Courier New', monospace" font-weight="700"
+          font-size="15" letter-spacing="1" fill="#000">.dev</text>
+  </g>
+
+  <!-- ===== Name (two lines, large) ===== -->
+  <text x="26.7" y="14.0" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="700"
+        font-size="4.6" letter-spacing="0.3" fill="#000">USB FLARM</text>
+
+  <text x="26.7" y="18.8" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="700"
+        font-size="4.6" letter-spacing="0.6" fill="#000">UPDATER</text>
+
+  <!-- ===== Rev + Date ===== -->
+  <text x="26.7" y="22.4" text-anchor="middle"
+        font-family="'Courier New', monospace" font-weight="700"
+        font-size="2.8" letter-spacing="0.4" fill="#000">REV B    2026-05</text>
+
+  <!-- ===== License notice ===== -->
+  <text x="26.7" y="25.2" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="700"
+        font-size="2.3" letter-spacing="0.15" fill="#000">CERN-OHL-S v2</text>
+
+  <!-- ===== Trademark disclaimer ===== -->
+  <text x="26.7" y="27.5" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="400"
+        font-size="1.6" letter-spacing="0.05" fill="#000">FLARM is a trademark of FLARM Technology Ltd.</text>
+
+  <text x="26.7" y="29.4" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-weight="400"
+        font-size="1.6" letter-spacing="0.05" fill="#000">Unofficial - not affiliated or endorsed</text>
+</svg>
