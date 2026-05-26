@@ -29,3 +29,7 @@ EDA/*.json
 
 # Logs
 *.log
+
+# Python
+__pycache__/
+*.pyc
