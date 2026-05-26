@@ -257,6 +257,12 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 ## Files
 
 - [EDA/USB_FLARM_UPDATER.eprj](EDA/USB_FLARM_UPDATER.eprj) — EasyEDA Pro project (REV B)
+- [EDA/ProPrj_USB_FLARM_UPDATER_2026-05-26.epro](EDA/ProPrj_USB_FLARM_UPDATER_2026-05-26.epro) — REV B source export (clean re-export)
+- [EDA/Gerber_PCB1_2026-05-27.zip](EDA/Gerber_PCB1_2026-05-27.zip) — REV B Gerber for JLCPCB
+- [EDA/BOM_Board1_PCB1_2026-05-27.csv](EDA/BOM_Board1_PCB1_2026-05-27.csv) — REV B BOM
+- [EDA/PickAndPlace_PCB1_2026-05-27.xlsx](EDA/PickAndPlace_PCB1_2026-05-27.xlsx) — REV B SMT pick-and-place
+- [EDA/Netlist_Schematic1_2026-05-27.tel](EDA/Netlist_Schematic1_2026-05-27.tel) — REV B netlist (for parser audit)
+- [EDA/silkscreen_back_REV_B.svg](EDA/silkscreen_back_REV_B.svg) — back silkscreen artwork
 - [EDA/USB_FLARM_UPDATER_backup/](EDA/USB_FLARM_UPDATER_backup/) — dated project snapshots
 - [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — generated design document
 - [Docs/create_design_doc.js](Docs/create_design_doc.js) — design document generator (`npm install docx && node Docs/create_design_doc.js`)
