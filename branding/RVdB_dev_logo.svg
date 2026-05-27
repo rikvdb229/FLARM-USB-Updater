@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 400 400"
+     width="400" height="400"
+     role="img" aria-label="RVdB.dev logo">
+
+  <!--
+    RVdB.dev logo — square format, suitable for profile pictures, favicons,
+    avatars, etc. Geometry inherited from EDA/silkscreen_back_REV_B.svg.
+
+    Uses `currentColor` so you can recolour at the embed site:
+        <svg style="color: white">  (dark background)
+        <svg style="color: black">  (light background, default)
+        <svg style="color: #1B3A5C"> (brand navy)
+
+    To rasterise for upload to Buy Me a Coffee, X, etc.:
+        Inkscape: File > Export PNG (set DPI for 400/800/1600 px output)
+        ImageMagick: magick -background none -density 800 RVdB_dev_logo.svg RVdB_dev_logo.png
+        Browser: open in Chrome, take a screenshot.
+  -->
+
+  <g transform="translate(40 116) scale(1.818)"
+     fill="currentColor" stroke="currentColor">
+
+    <!-- Octagonal outline -->
+    <polygon points="16,6 172,6 182,16 182,88 172,98 16,98 6,88 6,16"
+             fill="none" stroke-width="6" stroke-linejoin="miter"/>
+
+    <!-- "RVdB" main wordmark -->
+    <text x="94" y="58" text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif" font-weight="700"
+          font-size="44" letter-spacing="2" stroke="none">RVdB</text>
+
+    <!-- Horizontal divider -->
+    <line x1="20" y1="68" x2="168" y2="68" stroke-width="3"/>
+
+    <!-- ".dev" subscript -->
+    <text x="168" y="86" text-anchor="end"
+          font-family="'Courier New', monospace" font-weight="700"
+          font-size="15" letter-spacing="1" stroke="none">.dev</text>
+  </g>
+</svg>

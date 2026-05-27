@@ -33,3 +33,6 @@ EDA/*.json
 # Python
 __pycache__/
 *.pyc
+
+# Claude Code per-user local settings (project-shared settings.json stays tracked)
+.claude/settings.local.json

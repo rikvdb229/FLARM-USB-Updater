@@ -1,0 +1,9 @@
+# GitHub funding integration — shows a "Sponsor" button at the top of the repo.
+# Lives at buymeacoffee.com/rikvdb.
+
+buy_me_a_coffee: rikvdb
+
+# Optional: additional platforms can be listed side-by-side.
+# github: rikvdb229       # GitHub Sponsors (requires Stripe + tax setup)
+# ko_fi: handle           # Ko-fi alternative
+# custom: ['https://example.com/donate']
