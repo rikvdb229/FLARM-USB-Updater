@@ -214,9 +214,9 @@ After B5819W drop (~0.35V): ≈ **12.0V** at RJ45 — within FLARM 8–36V input
 | MT3608 boost @ 85mA load | 247          |
 | **Total USB draw**       | **~280mA**   |
 
-USB 2.0 limit: 500mA → 56% used. Works on any USB port.
+USB 2.0 limit: 500mA → 56% used. A **regular FLARM runs on any standard USB port** (bench-tested with a Flarm06).
 
-For PowerFLARM (165mA @ 12V): ~510mA USB draw — use USB-C charger (1.5A+).
+A **PowerFLARM** draws more (~165mA @ 12V → ~510mA on USB) — fine on USB 3.0 / USB-C ports, which supply well above 500mA. On an older 500mA USB 2.0 port that's right at the limit, so if it doesn't power up, use a USB-C charger (1.5A+).
 
 ## Cost Estimate (JLCPCB SMT assembly)
 
@@ -287,7 +287,7 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 This is fully open hardware — anyone can build the board from the Gerbers in [EDA/](EDA/) and the BOM. If the design or documentation saved you time, or you'd like to back continued development:
 
 - ☕ **[Buy Me a Coffee](https://buymeacoffee.com/rikvdb)** — one-time thanks, any amount
-- 🛒 **Pre-built, tested boards** are available for fellow pilots at ~€50 + shipping at cost (cost-share + small margin to fund the next batch). Open a [GitHub issue](../../issues/new) or reach out if interested.
+- 🛒 **Pre-built, tested boards** are available for fellow pilots at **~€40, shipping excluded** (cost-share + small margin to fund the next batch). Open a [GitHub issue](../../issues/new) or reach out if interested.
 
 Buying a board doesn't get you anything the open files don't — you're paying for assembly, testing, and the time saved. The repo is the canonical source either way.
 
