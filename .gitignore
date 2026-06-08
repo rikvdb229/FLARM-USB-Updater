@@ -34,5 +34,14 @@ EDA/*.json
 __pycache__/
 *.pyc
 
-# Claude Code per-user local settings (project-shared settings.json stays tracked)
-.claude/settings.local.json
+# Claude Code config (not part of the public project)
+.claude/
+
+# Vendored audit skill — internal tooling; lives in the canonical skill home
+.audit_skill/
+
+# Component datasheets — third-party copyrighted PDFs; linked via the BOM instead
+Datasheets/
+
+# Serial capture logs (may contain GPS / position data)
+*_log.txt

@@ -276,7 +276,7 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 - [Images/](Images/) — board photos used in this README
 - [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — generated design document
 - [Docs/create_design_doc.js](Docs/create_design_doc.js) — design document generator (`npm install docx && node Docs/create_design_doc.js`)
-- [Datasheets/](Datasheets/) — component datasheets
+- Component datasheets — see each part's LCSC code (C-number) in the [BOM](EDA/BOM_Board1_PCB1_2026-05-27.csv); enter it at lcsc.com for the datasheet
 - [Enclosure/](Enclosure/) — 3D-printable case: `box` + `lid` (STEP/3MF/STL) and `enclosure-assembly.step` (board-in-box fit reference)
 - [Archive/REV_A/](Archive/REV_A/) — REV A schematic, PCB, BOM, Gerber, rework guide, bring-up log
 - [monitor_com11.py](monitor_com11.py), [poke_flarm.py](poke_flarm.py) — serial bring-up and test scripts
