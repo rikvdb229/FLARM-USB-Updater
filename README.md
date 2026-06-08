@@ -2,7 +2,11 @@
 
 USB-to-RS232 adapter with 12V boost converter for updating FLARM firmware without external power.
 
+![FLARM USB Updater REV B — assembled board](Images/board-top.jpg)
+
 Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update tool. No 12V bench supply required. Also supports FLARM display firmware updates via the same connector.
+
+![In use — USB-C from the PC, RJ45 to the FLARM, green PWR LED lit](Images/board-in-use.jpg)
 
 > **Status:** REV B fab-ready. Fixes the REV A boost topology bug (12V rail was dead on all REV A boards). See [Archive/REV_A/](Archive/REV_A/) for the REV A schematic, rework guide, and bring-up log.
 
@@ -107,6 +111,10 @@ Designed in **EasyEDA Pro** for direct JLCPCB SMT assembly ordering.
 | 5       | FLARM TX  | RS232 RX input (MAX3232 R1IN)      |
 | 6       | FLARM RX  | RS232 TX output (MAX3232 T1OUT)    |
 | 9, 10   | Shield    | PCB GND copper pour                |
+
+The pinout is silkscreened on the back of the board:
+
+![Board back — silkscreen pinout legend, branding, and CERN-OHL-S licence](Images/board-back.jpg)
 
 > **SMD RJ45 note:** The RJ-064-1 connector uses reversed pad numbering (pad 1 = RJ45 pin 8). The PCB routing compensates for this — the netlist pad references and the RJ45 pin numbers in this table are intentionally different.
 
@@ -257,17 +265,19 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 ## Files
 
 - [EDA/USB_FLARM_UPDATER.eprj](EDA/USB_FLARM_UPDATER.eprj) — EasyEDA Pro project (REV B)
-- [EDA/ProPrj_USB_FLARM_UPDATER_2026-05-26.epro](EDA/ProPrj_USB_FLARM_UPDATER_2026-05-26.epro) — REV B source export (clean re-export)
+- [EDA/ProPrj_USB_FLARM_UPDATER_2026-05-29.epro](EDA/ProPrj_USB_FLARM_UPDATER_2026-05-29.epro) — REV B as-built source export (the fabbed design)
 - [EDA/Gerber_PCB1_2026-05-27.zip](EDA/Gerber_PCB1_2026-05-27.zip) — REV B Gerber for JLCPCB
 - [EDA/BOM_Board1_PCB1_2026-05-27.csv](EDA/BOM_Board1_PCB1_2026-05-27.csv) — REV B BOM
 - [EDA/PickAndPlace_PCB1_2026-05-27.xlsx](EDA/PickAndPlace_PCB1_2026-05-27.xlsx) — REV B SMT pick-and-place
 - [EDA/Netlist_Schematic1_2026-05-27.tel](EDA/Netlist_Schematic1_2026-05-27.tel) — REV B netlist (for parser audit)
 - [EDA/silkscreen_back_REV_B.svg](EDA/silkscreen_back_REV_B.svg) — back silkscreen artwork
 - [EDA/USB_FLARM_UPDATER_backup/](EDA/USB_FLARM_UPDATER_backup/) — dated project snapshots
+- [EDA/3DPCB.step](EDA/3DPCB.step) — board 3D model (STEP) for enclosure / mechanical design
+- [Images/](Images/) — board photos used in this README
 - [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — generated design document
 - [Docs/create_design_doc.js](Docs/create_design_doc.js) — design document generator (`npm install docx && node Docs/create_design_doc.js`)
 - [Datasheets/](Datasheets/) — component datasheets
-- [FLARM_USB_UPDATER.step](FLARM_USB_UPDATER.step) — 3D model export
+- [Enclosure/](Enclosure/) — 3D-printable case: `box` + `lid` (STEP/3MF/STL) and `enclosure-assembly.step` (board-in-box fit reference)
 - [Archive/REV_A/](Archive/REV_A/) — REV A schematic, PCB, BOM, Gerber, rework guide, bring-up log
 - [monitor_com11.py](monitor_com11.py), [poke_flarm.py](poke_flarm.py) — serial bring-up and test scripts
 - [LICENSE](LICENSE) — CERN-OHL-S v2 licence text

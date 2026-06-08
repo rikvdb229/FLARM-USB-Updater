@@ -1,12 +1,15 @@
-"""Monitor COM11 at 19200 baud, log to file with timestamps."""
+"""Monitor a serial port, log to file with timestamps.
+
+Usage: python monitor_com11.py [PORT] [BAUD]   (defaults: COM11 19200)
+"""
 import serial
 import time
 import sys
 from datetime import datetime
 
-PORT = "COM11"
-BAUD = 19200
-LOG_FILE = "com11_log.txt"
+PORT = sys.argv[1] if len(sys.argv) > 1 else "COM11"
+BAUD = int(sys.argv[2]) if len(sys.argv) > 2 else 19200
+LOG_FILE = f"{PORT.lower()}_log.txt"
 DURATION_HOURS = 6
 
 def main():

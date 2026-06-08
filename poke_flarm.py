@@ -1,9 +1,13 @@
-"""Send a FLARM version query on COM11 to check if it responds."""
+"""Send a FLARM version query to check if it responds.
+
+Usage: python poke_flarm.py [PORT] [BAUD]   (defaults: COM11 19200)
+"""
 import serial
+import sys
 import time
 
-PORT = "COM11"
-BAUD = 19200
+PORT = sys.argv[1] if len(sys.argv) > 1 else "COM11"
+BAUD = int(sys.argv[2]) if len(sys.argv) > 2 else 19200
 
 def nmea_checksum(sentence):
     """Calculate NMEA checksum for string between $ and *."""
