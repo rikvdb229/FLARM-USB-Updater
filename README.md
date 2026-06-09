@@ -259,7 +259,7 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 1. Visual inspection: USB-C orientation, RJ45 jack seating, no tombstoned 0402s
 2. USB plug-in: LED1 (green) on. Host enumerates as FTDI serial device.
 3. DMM: 5V on VUSB test points, 3.3V on V3V3, **12.0V on V12_OUT (RJ45 pins 1,2)**
-4. Loopback test via `poke_flarm.py` or `monitor_com11.py` — TX/RX LEDs flash
+4. Loopback test via `flarm_query.py` or `flarm_monitor.py` — TX/RX LEDs flash
 5. Connect FLARM on bench supply first (not live 12V aircraft bus) for initial test
 
 ## Files
@@ -274,12 +274,11 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 - [EDA/USB_FLARM_UPDATER_backup/](EDA/USB_FLARM_UPDATER_backup/) — dated project snapshots
 - [EDA/3DPCB.step](EDA/3DPCB.step) — board 3D model (STEP) for enclosure / mechanical design
 - [Images/](Images/) — board photos used in this README
-- [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — generated design document
-- [Docs/create_design_doc.js](Docs/create_design_doc.js) — design document generator (`npm install docx && node Docs/create_design_doc.js`)
+- [Docs/FLARM_USB_Updater_Design_Document.docx](Docs/FLARM_USB_Updater_Design_Document.docx) — design document (BOM, pinout, power budget, bring-up)
 - Component datasheets — see each part's LCSC code (C-number) in the [BOM](EDA/BOM_Board1_PCB1_2026-05-27.csv); enter it at lcsc.com for the datasheet
 - [Enclosure/](Enclosure/) — 3D-printable case: `box` + `lid` (STEP/3MF/STL) and `enclosure-assembly.step` (board-in-box fit reference)
 - [Archive/REV_A/](Archive/REV_A/) — REV A schematic, PCB, BOM, Gerber, rework guide, bring-up log
-- [monitor_com11.py](monitor_com11.py), [poke_flarm.py](poke_flarm.py) — serial bring-up and test scripts
+- [flarm_query.py](flarm_query.py) — query a connected FLARM (version / device info); [flarm_monitor.py](flarm_monitor.py) — log the serial NMEA stream
 - [LICENSE](LICENSE) — CERN-OHL-S v2 licence text
 
 ## Support the project

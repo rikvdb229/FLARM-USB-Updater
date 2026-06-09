@@ -1,6 +1,6 @@
 """Monitor a serial port, log to file with timestamps.
 
-Usage: python monitor_com11.py [PORT] [BAUD]   (defaults: COM11 19200)
+Usage: python flarm_monitor.py [PORT] [BAUD]   (defaults: COM11 19200)
 """
 import serial
 import time

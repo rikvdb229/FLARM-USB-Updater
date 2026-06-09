@@ -1,6 +1,6 @@
 """Send a FLARM version query to check if it responds.
 
-Usage: python poke_flarm.py [PORT] [BAUD]   (defaults: COM11 19200)
+Usage: python flarm_query.py [PORT] [BAUD]   (defaults: COM11 19200)
 """
 import serial
 import sys
@@ -48,5 +48,5 @@ for q in queries:
         else:
             break
 
-print("\nDone. Check com11_log.txt for any data captured by the monitor.")
+print("\nDone. (Run flarm_monitor.py to log the full stream to a file.)")
 ser.close()
