@@ -288,9 +288,15 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 This is fully open hardware — anyone can build the board from the Gerbers in [EDA/](EDA/) and the BOM. If the design or documentation saved you time, or you'd like to back continued development:
 
 - ☕ **[Buy Me a Coffee](https://buymeacoffee.com/rikvdb)** — one-time thanks, any amount
-- 🛒 **Pre-built, tested boards** are available for fellow pilots at **~€40, shipping excluded** (cost-share + small margin to fund the next batch). Open a [GitHub issue](../../issues/new) or reach out if interested.
+- 🛒 **Pre-built, tested boards** are available for fellow pilots at **~€40, shipping excluded** (cost-share + small margin to fund the next batch). Start a [Discussion](../../discussions) or email [flarm@rvdb.dev](mailto:flarm@rvdb.dev) if interested.
 
 Buying a board doesn't get you anything the open files don't — you're paying for assembly, testing, and the time saved. The repo is the canonical source either way.
+
+## Questions & Contact
+
+- 🐛 **Bug or technical problem** → [open an issue](../../issues/new)
+- 💬 **Question, build help, or interested in a board** → [GitHub Discussions](../../discussions)
+- ✉️ **Private / direct** → [flarm@rvdb.dev](mailto:flarm@rvdb.dev)
 
 ## License
 
