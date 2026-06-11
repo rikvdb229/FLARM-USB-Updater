@@ -45,3 +45,6 @@ Datasheets/
 
 # Serial capture logs (may contain GPS / position data)
 *_log.txt
+
+# Local-only lid emboss artwork (kept out of the repo by request)
+Enclosure/lid_artwork*.svg
