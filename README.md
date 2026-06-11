@@ -14,6 +14,8 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 
 > **Disclaimer:** This is an unofficial, community-built project. It is **not affiliated with, authorized, sponsored, or endorsed by FLARM Technology Ltd.** "FLARM" and "PowerFLARM" are trademarks of FLARM Technology Ltd.; they are used here only to describe device compatibility. Firmware updates are performed using FLARM's own official update tool — this project supplies power and a serial connection only. Use at your own risk; you are responsible for any device you connect it to.
 
+> 🛒 **Want one ready-made?** Pre-built, tested boards for fellow pilots — **~€40, shipping excluded** (cost-share to fund the next batch). Start a [Discussion](../../discussions) or email [flarm@rvdb.dev](mailto:flarm@rvdb.dev).
+
 ## Features
 
 - Powered entirely from USB (5V)
@@ -288,7 +290,7 @@ Netlist + BOM review, re-verified 2026-05-15 against the REV B EasyEDA project e
 This is fully open hardware — anyone can build the board from the Gerbers in [EDA/](EDA/) and the BOM. If the design or documentation saved you time, or you'd like to back continued development:
 
 - ☕ **[Buy Me a Coffee](https://buymeacoffee.com/rikvdb)** — one-time thanks, any amount
-- 🛒 **Pre-built, tested boards** are available for fellow pilots at **~€40, shipping excluded** (cost-share + small margin to fund the next batch). Start a [Discussion](../../discussions) or email [flarm@rvdb.dev](mailto:flarm@rvdb.dev) if interested.
+- 🛒 **Pre-built, tested boards** (~€40, shipping excluded) — see the note at the top, or reach out via [Discussions](../../discussions) / [flarm@rvdb.dev](mailto:flarm@rvdb.dev)
 
 Buying a board doesn't get you anything the open files don't — you're paying for assembly, testing, and the time saved. The repo is the canonical source either way.
 
