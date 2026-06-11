@@ -10,7 +10,7 @@ Plug into a PC USB port → connect RJ45 cable to FLARM → run firmware update 
 
 > **Tip — connection order:** connect the RJ45 to the FLARM *before* plugging the adapter into the PC. If you hot-plug the FLARM while it's already on USB, the COM port may briefly disconnect and reappear — that's harmless inrush (charging the FLARM's input capacitors through the boost momentarily dips the USB 5 V rail and re-enumerates the FT232), not a fault.
 
-> **Status:** REV B fab-ready. Fixes the REV A boost topology bug (12V rail was dead on all REV A boards). See [Archive/REV_A/](Archive/REV_A/) for the REV A schematic, rework guide, and bring-up log.
+> **Status:** REV B **built and validated** — bench-tested and confirmed updating real FLARM hardware over USB (boost, 12 V rail, and full serial path all verified). Fixes the REV A boost topology bug (12 V rail was dead on all REV A boards). See [Archive/REV_A/](Archive/REV_A/) for the REV A schematic, rework guide, and bring-up log.
 
 > **Disclaimer:** This is an unofficial, community-built project. It is **not affiliated with, authorized, sponsored, or endorsed by FLARM Technology Ltd.** "FLARM" and "PowerFLARM" are trademarks of FLARM Technology Ltd.; they are used here only to describe device compatibility. Firmware updates are performed using FLARM's own official update tool — this project supplies power and a serial connection only. Use at your own risk; you are responsible for any device you connect it to.
 
